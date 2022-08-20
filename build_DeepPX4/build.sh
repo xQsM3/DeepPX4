@@ -7,7 +7,7 @@ env="$4"
 
 echo "building DeepPX4 ..."
 # exit when any command fails
-set -e
+#set -e
 
 # move custom HANNASCAPES gazebo models
 if [ ! -d "$gazebo" ]; then
@@ -35,21 +35,29 @@ fi
 cp -r launch/HANNASSCAPES "$catkin_ws/src/avoidance/local_planner/launch"
 cp -r worlds/HANNASSCAPES "$catkin_ws/src/avoidance/avoidance/sim/worlds"
 
-echo "export to bashrc script"
-
-. "$px4"/Tools/setup_gazebo.bash ~/"$px4" ~/"$px4"/build/px4_sitl_default >> ~/.bashrc 
-export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:~/"$px4" >> ~/.bashrc 
-export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:~/"$catkin_ws"/src/avoidance/avoidance/sim/models:"$gazebo":./gazebo/models:~/"$px4"/Tools/sitl_gazebo/models:~/"$catkin_ws"/src/avoidance/avoidance/sim/models:./gazebo/models:~/.gazebo/models:~/"$px4"/Tools/sitl_gazebo/models:~/"$catkin_ws"/src/avoidance/avoidance/sim/models:~/"$catkin_ws"/src/avoidance/avoidance/sim/worlds >> ~/.bashrc 
-export GAZEBO_RESOURCE_PATH=${GAZEBO_RESOURCE_PATH}:/home/"xqsme"/"$catkin_ws"/src/avoidance/avoidance/sim/worlds/HANNASSCAPES >> ~/.bashrc 
 
 if [ ! -z "$env" ]
 then
 	echo "creating conda environment"
-	conda create --name "$env" python=3.8
-	conda activate "$env"
+	#conda create --name "$env" python=3.8
+	#conda activate "$env"
 	pip install -r requirements.txt
 	~/anaconda3/envs/"$env"/bin/python -m pip install paddlepaddle==2.3.1 -i https://mirror.baidu.com/pypi/simple
 	pip install paddleseg
 fi
 
-echo "DeepPX4 build successfull"
+echo "export to bashrc script"
+
+. "$px4"/Tools/setup_gazebo.bash ~/"$px4" ~/"$px4"/build/px4_sitl_default
+echo ". "$px4"/Tools/setup_gazebo.bash ~/"$px4" ~/"$px4"/build/px4_sitl_default" >> ~/.bashrc 
+
+export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:~/"$px4"
+echo "export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:~/"$px4"" >> ~/.bashrc
+
+export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:~/"$catkin_ws"/src/avoidance/avoidance/sim/models:"$gazebo":./gazebo/models:~/"$px4"/Tools/sitl_gazebo/models:~/"$catkin_ws"/src/avoidance/avoidance/sim/models:./gazebo/models:~/.gazebo/models:~/"$px4"/Tools/sitl_gazebo/models:~/"$catkin_ws"/src/avoidance/avoidance/sim/models:~/"$catkin_ws"/src/avoidance/avoidance/sim/worlds 
+echo "export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:~/"$catkin_ws"/src/avoidance/avoidance/sim/models:"$gazebo":./gazebo/models:~/"$px4"/Tools/sitl_gazebo/models:~/"$catkin_ws"/src/avoidance/avoidance/sim/models:./gazebo/models:~/.gazebo/models:~/"$px4"/Tools/sitl_gazebo/models:~/"$catkin_ws"/src/avoidance/avoidance/sim/models:~/"$catkin_ws"/src/avoidance/avoidance/sim/worlds" >> ~/.bashrc
+
+export GAZEBO_RESOURCE_PATH=${GAZEBO_RESOURCE_PATH}:/home/"xqsme"/"$catkin_ws"/src/avoidance/avoidance/sim/worlds/HANNASSCAPES 
+echo "export GAZEBO_RESOURCE_PATH=${GAZEBO_RESOURCE_PATH}:/home/"xqsme"/"$catkin_ws"/src/avoidance/avoidance/sim/worlds/HANNASSCAPES" >> ~/.bashrc 
+
+echo "DeepPX4 built, watch out for any errors above"
