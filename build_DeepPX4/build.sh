@@ -39,15 +39,18 @@ cp -r worlds/HANNASSCAPES "$catkin_ws/src/avoidance/avoidance/sim/worlds"
 if [ ! -z "$env" ]
 then
 	echo "creating conda environment"
-	#conda create --name "$env" python=3.8
-	#conda activate "$env"
+	conda create --name "$env" python=3.8
+	conda activate "$env"
 	pip install -r requirements.txt
 	~/anaconda3/envs/"$env"/bin/python -m pip install paddlepaddle==2.3.1 -i https://mirror.baidu.com/pypi/simple
 	pip install paddleseg
+	pip install rospkg
 fi
 
 echo "export to bashrc script"
 
+export PYTHONPATH=${PYTHONPATH}:~/DeepPX4/src:~/DeepPX4/src/segmentation
+echo "export PYTHONPATH=${PYTHONPATH}:~/DeepPX4/src:~/DeepPX4/src/segmentation" >> ~/.bashrc
 . "$px4"/Tools/setup_gazebo.bash ~/"$px4" ~/"$px4"/build/px4_sitl_default
 echo ". "$px4"/Tools/setup_gazebo.bash ~/"$px4" ~/"$px4"/build/px4_sitl_default" >> ~/.bashrc 
 

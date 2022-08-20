@@ -2,7 +2,7 @@
 
 message(STATUS "segmentation: 1 messages, 1 services")
 
-set(MSG_I_FLAGS "-Isegmentation:/home/xqsme/DeepPX4/src/segmentation/msg;-Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg;-Isensor_msgs:/opt/ros/noetic/share/sensor_msgs/cmake/../msg;-Isegmentation:/home/xqsme/DeepPX4/src/segmentation/msg;-Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg")
+set(MSG_I_FLAGS "-Isegmentation:/home/linux123/DeepPX4/src/segmentation/msg;-Istd_msgs:/opt/ros/melodic/share/std_msgs/cmake/../msg;-Isensor_msgs:/opt/ros/melodic/share/sensor_msgs/cmake/../msg;-Isegmentation:/home/linux123/DeepPX4/src/segmentation/msg;-Igeometry_msgs:/opt/ros/melodic/share/geometry_msgs/cmake/../msg")
 
 # Find all generators
 find_package(gencpp REQUIRED)
@@ -17,14 +17,14 @@ add_custom_target(segmentation_generate_messages ALL)
 
 
 
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
 add_custom_target(_segmentation_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "segmentation" "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg" "sensor_msgs/CameraInfo:sensor_msgs/Image:std_msgs/Header:sensor_msgs/RegionOfInterest"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "segmentation" "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv" "sensor_msgs/CameraInfo:sensor_msgs/Image:std_msgs/Header:sensor_msgs/RegionOfInterest:segmentation/SegImage"
 )
 
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
 add_custom_target(_segmentation_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "segmentation" "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv" "sensor_msgs/RegionOfInterest:sensor_msgs/CameraInfo:std_msgs/Header:segmentation/SegImage:sensor_msgs/Image"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "segmentation" "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg" "sensor_msgs/CameraInfo:sensor_msgs/Image:sensor_msgs/RegionOfInterest:std_msgs/Header"
 )
 
 #
@@ -34,17 +34,17 @@ add_custom_target(_segmentation_generate_messages_check_deps_${_filename}
 ### Section generating for lang: gencpp
 ### Generating Messages
 _generate_msg_cpp(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg"
+  "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/segmentation
 )
 
 ### Generating Services
 _generate_srv_cpp(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv"
+  "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/segmentation
 )
 
@@ -60,9 +60,9 @@ add_custom_target(segmentation_generate_messages_cpp
 add_dependencies(segmentation_generate_messages segmentation_generate_messages_cpp)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
 add_dependencies(segmentation_generate_messages_cpp _segmentation_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
 add_dependencies(segmentation_generate_messages_cpp _segmentation_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -75,17 +75,17 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS segmentation_generate_messages_cpp)
 ### Section generating for lang: geneus
 ### Generating Messages
 _generate_msg_eus(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg"
+  "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/segmentation
 )
 
 ### Generating Services
 _generate_srv_eus(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv"
+  "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/segmentation
 )
 
@@ -101,9 +101,9 @@ add_custom_target(segmentation_generate_messages_eus
 add_dependencies(segmentation_generate_messages segmentation_generate_messages_eus)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
 add_dependencies(segmentation_generate_messages_eus _segmentation_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
 add_dependencies(segmentation_generate_messages_eus _segmentation_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -116,17 +116,17 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS segmentation_generate_messages_eus)
 ### Section generating for lang: genlisp
 ### Generating Messages
 _generate_msg_lisp(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg"
+  "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/segmentation
 )
 
 ### Generating Services
 _generate_srv_lisp(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv"
+  "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/segmentation
 )
 
@@ -142,9 +142,9 @@ add_custom_target(segmentation_generate_messages_lisp
 add_dependencies(segmentation_generate_messages segmentation_generate_messages_lisp)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
 add_dependencies(segmentation_generate_messages_lisp _segmentation_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
 add_dependencies(segmentation_generate_messages_lisp _segmentation_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -157,17 +157,17 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS segmentation_generate_messages_lisp
 ### Section generating for lang: gennodejs
 ### Generating Messages
 _generate_msg_nodejs(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg"
+  "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/segmentation
 )
 
 ### Generating Services
 _generate_srv_nodejs(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv"
+  "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/segmentation
 )
 
@@ -183,9 +183,9 @@ add_custom_target(segmentation_generate_messages_nodejs
 add_dependencies(segmentation_generate_messages segmentation_generate_messages_nodejs)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
 add_dependencies(segmentation_generate_messages_nodejs _segmentation_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
 add_dependencies(segmentation_generate_messages_nodejs _segmentation_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -198,17 +198,17 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS segmentation_generate_messages_node
 ### Section generating for lang: genpy
 ### Generating Messages
 _generate_msg_py(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg"
+  "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/segmentation
 )
 
 ### Generating Services
 _generate_srv_py(segmentation
-  "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv"
+  "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg;/opt/ros/noetic/share/sensor_msgs/cmake/../msg/Image.msg"
+  "/opt/ros/melodic/share/sensor_msgs/cmake/../msg/CameraInfo.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/Image.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/melodic/share/sensor_msgs/cmake/../msg/RegionOfInterest.msg;/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/segmentation
 )
 
@@ -224,9 +224,9 @@ add_custom_target(segmentation_generate_messages_py
 add_dependencies(segmentation_generate_messages segmentation_generate_messages_py)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
 add_dependencies(segmentation_generate_messages_py _segmentation_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/xqsme/DeepPX4/src/segmentation/srv/Segmentation.srv" NAME_WE)
+get_filename_component(_filename "/home/linux123/DeepPX4/src/segmentation/msg/SegImage.msg" NAME_WE)
 add_dependencies(segmentation_generate_messages_py _segmentation_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -307,7 +307,7 @@ if(TARGET segmentation_generate_messages_nodejs)
 endif()
 
 if(genpy_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/segmentation)
-  install(CODE "execute_process(COMMAND \"/usr/bin/python3\" -m compileall \"${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/segmentation\")")
+  install(CODE "execute_process(COMMAND \"/usr/bin/python2\" -m compileall \"${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/segmentation\")")
   # install generated code
   install(
     DIRECTORY ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/segmentation

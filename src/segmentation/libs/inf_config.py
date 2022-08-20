@@ -1,9 +1,10 @@
 import yaml
 import os
-
+import rospkg
 def relative_to_abs_path(path):
-    pkg_dir = os.path.dirname(os.getcwd())
     if not os.path.isabs(path):
+        rospack = rospkg.RosPack()
+        pkg_dir = rospack.get_path("segmentation")
         path = os.path.join(pkg_dir,path)
     return path
 

@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
-  "/home/xqsme/DeepPX4/devel/share/common-lisp/ros/segmentation/msg/SegImage.lisp"
-  "/home/xqsme/DeepPX4/devel/share/common-lisp/ros/segmentation/srv/Segmentation.lisp"
   "CMakeFiles/segmentation_generate_messages_lisp"
+  "/home/linux123/DeepPX4/devel/share/common-lisp/ros/segmentation/msg/SegImage.lisp"
+  "/home/linux123/DeepPX4/devel/share/common-lisp/ros/segmentation/srv/Segmentation.lisp"
 )
 
 # Per-language clean rules from dependency scanning.

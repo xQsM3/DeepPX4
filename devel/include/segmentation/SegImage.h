@@ -102,16 +102,6 @@ namespace message_traits
 
 
 template <class ContainerAllocator>
-struct IsMessage< ::segmentation::SegImage_<ContainerAllocator> >
-  : TrueType
-  { };
-
-template <class ContainerAllocator>
-struct IsMessage< ::segmentation::SegImage_<ContainerAllocator> const>
-  : TrueType
-  { };
-
-template <class ContainerAllocator>
 struct IsFixedSize< ::segmentation::SegImage_<ContainerAllocator> >
   : FalseType
   { };
@@ -119,6 +109,16 @@ struct IsFixedSize< ::segmentation::SegImage_<ContainerAllocator> >
 template <class ContainerAllocator>
 struct IsFixedSize< ::segmentation::SegImage_<ContainerAllocator> const>
   : FalseType
+  { };
+
+template <class ContainerAllocator>
+struct IsMessage< ::segmentation::SegImage_<ContainerAllocator> >
+  : TrueType
+  { };
+
+template <class ContainerAllocator>
+struct IsMessage< ::segmentation::SegImage_<ContainerAllocator> const>
+  : TrueType
   { };
 
 template <class ContainerAllocator>

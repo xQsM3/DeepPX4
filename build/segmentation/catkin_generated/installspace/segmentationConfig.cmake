@@ -67,14 +67,14 @@ set(segmentation_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(segmentation_SOURCE_PREFIX /home/xqsme/DeepPX4/src/segmentation)
-  set(segmentation_DEVEL_PREFIX /home/xqsme/DeepPX4/devel)
+  set(segmentation_SOURCE_PREFIX /home/linux123/DeepPX4/src/segmentation)
+  set(segmentation_DEVEL_PREFIX /home/linux123/DeepPX4/devel)
   set(segmentation_INSTALL_PREFIX "")
   set(segmentation_PREFIX ${segmentation_DEVEL_PREFIX})
 else()
   set(segmentation_SOURCE_PREFIX "")
   set(segmentation_DEVEL_PREFIX "")
-  set(segmentation_INSTALL_PREFIX /home/xqsme/DeepPX4/install)
+  set(segmentation_INSTALL_PREFIX /home/linux123/DeepPX4/install)
   set(segmentation_PREFIX ${segmentation_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/xqsme/DeepPX4/install/lib;/home/xqsme/catkin_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/linux123/DeepPX4/install/lib;/home/linux123/catkin_ws/devel/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -211,7 +211,7 @@ foreach(depend ${depends})
   _unpack_libraries_with_build_configuration(segmentation_LIBRARIES ${segmentation_LIBRARIES})
 
   _list_append_unique(segmentation_LIBRARY_DIRS ${${segmentation_dep}_LIBRARY_DIRS})
-  _list_append_deduplicate(segmentation_EXPORTED_TARGETS ${${segmentation_dep}_EXPORTED_TARGETS})
+  list(APPEND segmentation_EXPORTED_TARGETS ${${segmentation_dep}_EXPORTED_TARGETS})
 endforeach()
 
 set(pkg_cfg_extras "segmentation-msg-extras.cmake")

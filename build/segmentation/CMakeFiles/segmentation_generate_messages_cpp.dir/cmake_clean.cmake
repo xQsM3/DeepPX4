@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
-  "/home/xqsme/DeepPX4/devel/include/segmentation/SegImage.h"
-  "/home/xqsme/DeepPX4/devel/include/segmentation/Segmentation.h"
   "CMakeFiles/segmentation_generate_messages_cpp"
+  "/home/linux123/DeepPX4/devel/include/segmentation/SegImage.h"
+  "/home/linux123/DeepPX4/devel/include/segmentation/Segmentation.h"
 )
 
 # Per-language clean rules from dependency scanning.

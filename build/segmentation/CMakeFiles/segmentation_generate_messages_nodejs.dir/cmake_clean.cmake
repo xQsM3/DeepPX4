@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
-  "/home/xqsme/DeepPX4/devel/share/gennodejs/ros/segmentation/msg/SegImage.js"
-  "/home/xqsme/DeepPX4/devel/share/gennodejs/ros/segmentation/srv/Segmentation.js"
   "CMakeFiles/segmentation_generate_messages_nodejs"
+  "/home/linux123/DeepPX4/devel/share/gennodejs/ros/segmentation/msg/SegImage.js"
+  "/home/linux123/DeepPX4/devel/share/gennodejs/ros/segmentation/srv/Segmentation.js"
 )
 
 # Per-language clean rules from dependency scanning.
