@@ -16,9 +16,10 @@ from utils.fix_melodic import CvBridgeMelodic
 def segmentation_client(image_topic):
     # get image from drone camera
     im_msg = rospy.wait_for_message(image_topic, Image,timeout=20)
-
-    #im = cv.imread("/home/xqsme/Pictures/test2.png")
-    #im_msg = CvBridge().cv2_to_imgmsg(im,encoding="bgr8")
+    #image = CvBridgeMelodic().imgmsg_to_cv2(im_msg, desired_encoding="passthrough")
+    #cv.imshow("window",image)
+    #cv.waitKey()
+    #cv.destroyAllWindows()
     seg_msg = SegImage()
     seg_msg.image = im_msg
     seg_msg.header.stamp = rospy.Time.now()

@@ -74,6 +74,6 @@ class NN:
             pred = pred.numpy().astype('uint8')
 
             #pred_mask = utils.visualize.get_pseudo_color_map(pred, self.color_map)
-            colored_pred = addcolor(pred,color_map=self.color_map)
+            #colored_pred = addcolor(pred,color_map=self.color_map)
 
-            return np.array(colored_pred)
+            return pred#np.array(colored_pred)
