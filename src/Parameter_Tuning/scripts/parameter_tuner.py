@@ -16,6 +16,13 @@ from cv_bridge import CvBridge
 from utils import visualize
 from libs import inf_config
 
+
+class ImageListener():
+    def __init__(self,image_topic):
+        rospy.Subscriber(image_topic,Image,self.callback)
+        self.im_msg = rospy.wait_for_message(image_topic,Image,timeout=20)
+    def callback(self,im_msg):
+        self.im_msg = im_msg
 class Px4Tuner():
     '''
     class which handles the parameter tuning of px4
@@ -85,10 +92,11 @@ def tuning_loop(image_topic, hz, lut_path,model_config_path):
     tune = Px4Tuner(lut_path=lut_path,model_config=model_config_path)
     rate = rospy.Rate(hz)
     color_map = get_color_map(model_config_path)
+    im_listener = ImageListener(image_topic)
 
     while not rospy.is_shutdown():
         # get segmentation
-        pred = seg_client.segmentation_client(image_topic)
+        pred = seg_client.segmentation_client(image_topic,im_listener.im_msg)
         # publish colored segmentation
         pred_colored = visualize.addcolor(pred,color_map)
         if fix_melodic.CvBridgeMelodic().fix_needed():

@@ -1,0 +1,218 @@
+#!/usr/bin/env bash
+#
+#
+# Adaption of px4_sim_script by Andreas Thoma
+# Bachelorarbeit- Parameterstudie
+#
+# Durchführung einer Flugmission und Erfassung der Daten
+# 
+#
+
+
+# Version 1.0 - new Pc
+
+#checking if required tools are installed
+if ! command -v xmlstarlet &> /dev/null;
+then
+    sudo apt-get install xmlstarlet 	### installing xmlstarlet ###
+    exit
+fi
+
+echo "in nodelet"
+
+#setting inputs to variables
+launchfile=${1?$(tput setaf 1)Error: no launchfile given$(tput setaf 7)}
+
+#init
+p=1
+dir=$(eval echo ~$USER)
+goal_x_takeoff=0
+goal_y_takeoff=0
+goal_z_takeoff=5
+l=1
+
+
+#creating resutls folder
+save_path="$dir/bagfiles_all_worlds";
+mkdir -p $save_path;	### creating bagifiles directory ###
+
+run=true;
+
+while ($run)
+do
+	#Schleifen Init
+	SECONDS=0
+
+	#killing all previous ros nodes, etc.
+	rosnode kill /my_bag 2> /dev/null ; ### 2> /dev/null suppresses Error messages ### 		
+	killall -2 -w -q roslaunch;   	### -w wait for processes to die ; -q no complain if nothing closed ; -v signal if succesfull ; -g = processgroup ; ###  
+	killall -w -q gzserver;		
+		 
+	#set goal variables
+	goal_x=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_x_param']/@value" "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
+	goal_y=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_y_param']/@value" "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
+	goal_z=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_z_param']/@value" "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
+	goal=("$goal_x","$goal_y","$goal_z")
+
+	# Time Limits
+	TIME_LIMIT=$(echo "(($goal_x*11000/50)*90)/10000+60" | bc )
+	takeoff_time=60
+
+	#set names
+	name=("$launchfile"_"${goal[@]}"_"$l")
+	name1=("$launchfile"_"${goal[@]}"_"$l".bag)
+	name2=("$launchfile"_"${goal[@]}"_"$l"_error.bag)
+			
+	#start simulation
+	gnome-terminal --tab -- roslaunch local_planner $launchfile    
+	sleep 10
+	if    ### checking for errors at the beginning ###
+	      ! pgrep -f "gazebo-" >/dev/null  	 	||
+	      ! pgrep -f "mavros-" >/dev/null 		 	||
+	      #! pgrep -f "gazebo_gui-" >/dev/null 	 	||
+	      ! pgrep -f "local_planner_manager-" >/dev/null 	||
+	      ! pgrep -f "local_planner_nodelet-" >/dev/null 	||
+	      ! pgrep -f "rviz-" >/dev/null	; 
+	then continue 
+	else	### setting parameters; recording data; takeoff request; setting first waypoint to 5,0,0 to be able to use negative z-direction ###  					  
+		############ for optimization #####
+		 gnome-terminal --tab -- /bin/bash -c 'rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z_takeoff';
+						  timeout 5s rostopic pub -1 /move_base_simple/goal geometry_msgs/PoseStamped "{pose: {position: {x: '$goal_x_takeoff', y: '$goal_y_takeoff'}}}";
+						  rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z_takeoff';
+						  rosrun mavros mavsys mode -c OFFBOARD;rosrun mavros mavsafety arm;cd ~/bagfiles_all_worlds; 
+						  rosbag record -O '$save_path'/'${name[*]}'.bag /mavros/local_position /mavros/battery /mavros/home_position/home /mavros/local_position/accel /mavros/local_position/pose /mavros/local_position/velocity_body_cov /mavros/local_position/velocity_body /local_planner_nodelet/parameter_descriptions /local_planner_nodelet/parameter_updates /mavros/imu/data_raw /mavros/local_position/velocity_local /drone /path_actual __name:=my_bag'; #;exec'
+		echo "seg terminal"
+		gnome-terminal --tab -- /bin/bash -c 'cd ~/DeepPX4; catkin_make; 
+						source devel/setup.bash; 
+						cd ~/DeepPX4/src/Parameter_Tuning/scripts; 
+						python parameter_tuner.py;'
+
+		sleep 3
+			
+	fi
+
+	##############
+	u=1;
+	while [ "$SECONDS" -le "$takeoff_time" ] 	### checking if first waypoint (0,0,5) is reached and set new waypoint (our actual goal) ###
+	do
+	  sleep 0.1; 
+	  if
+	  ( (( $(echo "$(echo "$goal_x_takeoff - 1" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&     
+	    (( $(echo "$(echo "$goal_y_takeoff - 1" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&	
+	    (( $(echo "$(echo "$goal_z_takeoff - 4.5" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&
+	    (( $(echo "$(echo "$goal_x_takeoff + 1" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&     
+	    (( $(echo "$(echo "$goal_y_takeoff + 1" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) && 
+	    (( $(echo "$(echo "$goal_z_takeoff + 1" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) ) ; 
+	  then
+		gnome-terminal --tab -- /bin/bash -c 'rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z';
+		timeout 5s rostopic pub -1 /move_base_simple/goal geometry_msgs/PoseStamped "{pose: {position: {x: '$goal_x', y: '$goal_y'}}}";';
+		#'rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z';';
+		u=0;
+		break
+	  fi 
+	done	 
+
+	########################	checking if new goal is successfully set	####################################################################################
+	start_x_coordinate=0;
+	start_y_coordinate=0;
+	start_z_coordinate=5;
+	echo "set new goal"	
+	sleep 20;
+	if
+  ( (( $(echo "$(echo "$start_x_coordinate - 0.3" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&     
+    (( $(echo "$(echo "$start_y_coordinate - 0.3" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&	
+    (( $(echo "$(echo "$start_z_coordinate - 0.3" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&
+    (( $(echo "$(echo "$start_x_coordinate + 0.3" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&     
+    (( $(echo "$(echo "$start_y_coordinate + 0.3" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) && 
+    (( $(echo "$(echo "$start_z_coordinate + 0.3" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) ) ; 
+	then 	
+		u=1;	
+	fi
+	 
+	######################################################################################################################################
+	if [ $u == 1 ] ; then 
+		continue 	
+	fi 
+
+	################################	cheking if drone has made progress (is the drone flying back and forth in y-direction?)	############# 
+	j1=0;
+	j2=0; 
+	amount_positiv_y_heading=0; 
+	amount_negativ_y_heading=0;
+	turnover=0;
+	definiton_turn=2;
+	reached_goal=0;
+
+	while [ "$SECONDS" -le "$TIME_LIMIT" ]   
+	do     
+
+		sleep 0.1; 
+		if    ### checking for errors ###
+		      ! pgrep -f "gazebo-" >/dev/null  	 	||
+		      ! pgrep -f "mavros-" >/dev/null 		 	||
+		      #! pgrep -f "gazebo_gui-9" >/dev/null 	 	||
+		      ! pgrep -f "local_planner_manager-" >/dev/null 	||
+		      ! pgrep -f "local_planner_nodelet-" >/dev/null 	||
+		      ! pgrep -f "rviz-" >/dev/null		 ;
+		then  
+			continue 2
+		elif 
+	  ( (( $(echo "$(echo "$goal_x - 0.5" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&     
+	    (( $(echo "$(echo "$goal_y - 0.5" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&	
+	    (( $(echo "$(echo "$goal_z - 0.5" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&
+	    (( $(echo "$(echo "$goal_x + 0.5" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&     
+	    (( $(echo "$(echo "$goal_y + 0.5" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) && 
+	    (( $(echo "$(echo "$goal_z + 0.5" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) ) ;
+		then
+
+			reached_goal=$(echo "($reached_goal+1)" | bc);
+			if [ $reached_goal == 2 ] ;then 
+				p=0;
+				run=false;
+				break
+			fi
+
+		else #Simulation läuft
+
+			reached_goal=0;
+			j1=$j2;	
+			j2=$(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')
+
+			if (( $(echo "$j1 > $j2" | bc -l) ));then			#x
+				amount_negativ_y_heading=$(echo "($amount_negativ_y_heading+1)" | bc);
+			elif (( $(echo "$j1 < $j2" | bc -l) ));then			#x
+				amount_positiv_y_heading=$(echo "($amount_positiv_y_heading+1)" | bc);					
+			fi
+
+			if [ $amount_positiv_y_heading -ge $definiton_turn ] && [ $amount_negativ_y_heading -ge $definiton_turn ] ;then  #(x)
+				turnover=$(echo "($turnover+1)" | bc);
+				if [ $turnover == 1 ] ;then		#x	
+					reference_x_position=$(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')
+				elif [ $turnover == 3 ] ;then	#x
+					if (( $(echo "$(echo "$reference_x_position + 2" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')"  | bc -l) ));then		
+						run=false; break;
+					else
+						turnover=0;
+					fi
+				fi		
+				amount_positiv_y_heading=0;
+				amount_negativ_y_heading=0;					
+			fi
+
+		fi		
+	done
+#	if [ "$SECONDS" -gt "$TIME_LIMIT" ]; then 
+#		run=false; break;
+#	fi
+	run=false;
+done
+
+#kill last node
+rosnode kill /my_bag;		   		
+killall -2 -w  roslaunch ;
+killall -q gzserver
+
+#check if last simulation was successfull
+if [ $p == 1 ] && [ -f "$save_path/$name1" ]; then
+mv "$save_path"/"$name1" "$save_path"/"$name2"
+fi

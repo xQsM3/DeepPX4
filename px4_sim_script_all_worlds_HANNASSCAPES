@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+#
+#
+# Andreas extention to px4_sim_script_extention_automated
+# Seyfullah Seker
+# Bachelorarbeit- Parameterstudie
+#
+# extension to 'px4_sim_script'
+# 
+#
+#Please set values/strings: 
+#launchname startvalue endvalue email; e.g.:
+: <<KOMMENTARIO
+./px4_sim_script_all_worlds city_obst
+KOMMENTARIO
+
+####### put this file and px4_sim_script in the main directory (/home/"your id") ############
+
+###		POSSIBLE ERROR		### 
+# when using script from GitKraken on Ubuntu either:  
+#	- use dos2unix to change file format to Unix 
+#	- copy-paste content to file created on Ubuntu directly rather than downloading it from GitKraken 
+
+echo "Skript started"
+
+launchname=${1?$(tput setaf 1)Error: no launchname or textfile given (eg. simple_obst or check_missing)$(tput setaf 7)}
+ 
+	start=1;
+
+	if [[ $launchname == "simple_obst" ]]; then
+		end=900
+	elif [[ $launchname == "natural_obst" ]]; then
+		end=165
+	elif [[ $launchname == "city_obst" ]]; then
+		end=1408
+	else
+		end=0
+	fi
+	
+	if [[ end==0 ]]; then
+		for i in 1 2 3
+		do
+			case $i in
+			  1) 
+				end=900
+				launchname="simple_obst";;
+			  2) 
+				end=165
+				launchname="natural_obst";;
+			  3) 
+				end=1408
+				launchname="city_obst";;
+			esac
+			goal_x=(default) 
+			goal_y=(default) 
+			goal_z=(default) 
+			t=$start 
+			dir=$(eval echo ~$USER)
+		 
+			echo "start launch file"
+
+			while (( $t <= $end )) 
+			 do  
+				launchfile=("HANNASSCAPES_$launchname"_"$t".launch); 
+		 
+				if [ ! -f "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile" ]; then	### cheking if given launchfile exists/is in the correct directory ### 
+				    tput setaf 1; echo "Error:launchfile not found!" ;tput setaf 7; 
+				    echo "Enterd: $launchname "; 
+				    printf "Searched launchfile: %s\n" "$launchfile" 
+					exit 1  
+				fi 
+				 
+				t=$(echo "($t+1)" | bc) 
+		 		./px4_sim_script_all_worlds_nodelet_HANNASSCAPES $launchfile;
+				
+				#conda activate paddleseg_cpu
+				#cd ~/DeepPX4/src/scripts
+				#python parameter_tuner.py
+
+			done
+		done
+	else
+		goal_x=(default) 
+		goal_y=(default) 
+		goal_z=(default) 
+		t=$start 
+		dir=$(eval echo ~$USER)
+	 
+		while (( $t <= $end )) 
+		 do  
+			launchfile=("$launchname"_"$t".launch); 
+	 
+			if [ ! -f "$dir"/catkin_ws/src/avoidance/local_planner/launch/"$launchfile" ]; then	### cheking if given launchfile exists/is in the correct directory ### 
+			    tput setaf 1; echo "Error:launchfile not found!" ;tput setaf 7; 
+			    echo "Enterd: $launchname "; 
+			    printf "Searched launchfile: %s\n" "$launchfile" 
+				exit 1  
+			fi 
+			 
+			t=$(echo "($t+1)" | bc) 
+	 		./px4_sim_script_all_worlds_nodelet_HANNASSCAPES $launchfile;
+		done
+	fi

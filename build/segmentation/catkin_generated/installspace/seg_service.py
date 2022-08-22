@@ -57,11 +57,19 @@ def init():
             pass
     pargs = ParserDummy()
 
-    if rospy.get_param("/segmentation_server/config") and rospy.get_param("/segmentation_server/device"):
+
+    try:
         pargs.config = rospy.get_param("/segmentation_server/config")
         pargs.device = rospy.get_param("/segmentation_server/device")
-    else:
-        raise ValueError(usage())
+        success = True
+    except:
+        success = False
+    if not success:
+        try:
+            pargs.config = sys.argv[1]
+            pargs.device = sys.argv[2]
+        except:
+            raise ValueError(usage())
 
     return model_init(pargs)
 
