@@ -45,6 +45,8 @@ then
 	~/anaconda3/envs/"$env"/bin/python -m pip install paddlepaddle==2.3.1 -i https://mirror.baidu.com/pypi/simple
 	pip install paddleseg
 	pip install rospkg
+	pip install pyquaternion
+	pip install scipy
 fi
 
 echo "export to bashrc script"

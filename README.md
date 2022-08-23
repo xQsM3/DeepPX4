@@ -60,7 +60,7 @@ https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.6/docs/install.md
   
 bash build.sh [catkin_ws] [gazebo] [px4] [env]  
 e.g.:  
-bash build.sh ~/catkin_ws ~/.gazebo ~/src/Firmware paddleseg_cpu  
+bash build.sh ~/catkin_ws ~/.gazebo ~/Firmware paddleseg_cpu  #change FIrmware path to your path
 
 
 cd ~/DeepPX4  
@@ -78,11 +78,11 @@ cd ~/DeepPx4 ./px4_sim_script_all_worlds_HANNASSCAPES all
 cd ~/catkin_ws  
 catkin build -w ~/catkin_ws # if not build yet  
 source ~/catkin_ws/devel/setup.bash  
-cd ~/src/Firmware  
+cd ~/Firmware  # change this if you install firmware somewhere else
 source Tools/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default  
 export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd):$(pwd)/Tools/sitl_gazebo  
 roslaunch local_planner HANNASSCAPES_city_obst_1.launch #run a world    
-
+rosrun mavros mavsys mode -c OFFBOARD; rosrun mavros mavsafety arm
 2) terminal  
 cd ~/DeepPX4  
 conda activate paddleseg_cpu # if working with virtual environment  
