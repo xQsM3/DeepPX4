@@ -64,6 +64,7 @@ do
 	name2=("$launchfile"_"${goal[@]}"_"$l"_error.bag)
 			
 	#start simulation
+	echo "start local_planner"
 	gnome-terminal --tab -- roslaunch local_planner $launchfile    
 	sleep 10
 	if    ### checking for errors at the beginning ###
@@ -81,14 +82,15 @@ do
 						  rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z_takeoff';
 						  rosrun mavros mavsys mode -c OFFBOARD;rosrun mavros mavsafety arm;cd ~/bagfiles_all_worlds; 
 						  rosbag record -O '$save_path'/'${name[*]}'.bag /mavros/local_position /mavros/battery /mavros/home_position/home /mavros/local_position/accel /mavros/local_position/pose /mavros/local_position/velocity_body_cov /mavros/local_position/velocity_body /local_planner_nodelet/parameter_descriptions /local_planner_nodelet/parameter_updates /mavros/imu/data_raw /mavros/local_position/velocity_local /drone /path_actual __name:=my_bag'; #;exec'
+		
 		echo "seg terminal"
-		gnome-terminal --tab -- /bin/bash -c 'cd ~/DeepPX4; catkin_make; 
-						source devel/setup.bash; 
+		gnome-terminal --tab --title segterminal -- /bin/bash -c 'cd ~/DeepPX4; catkin_make;
+						source devel/setup.bash;
+						source ~/anaconda3/etc/profile.d/conda.sh; 							conda activate paddleseg_cpu;
 						cd ~/DeepPX4/src/Parameter_Tuning/scripts; 
 						python parameter_tuner.py;'
 
-		sleep 3
-			
+		#sleep 3			
 	fi
 
 	##############
@@ -104,7 +106,7 @@ do
 	    (( $(echo "$(echo "$goal_y_takeoff + 1" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) && 
 	    (( $(echo "$(echo "$goal_z_takeoff + 1" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) ) ; 
 	  then
-		gnome-terminal --tab -- /bin/bash -c 'rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z';
+		gnome-terminal --tab  -- /bin/bash -c 'rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z';
 		timeout 5s rostopic pub -1 /move_base_simple/goal geometry_msgs/PoseStamped "{pose: {position: {x: '$goal_x', y: '$goal_y'}}}";';
 		#'rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z';';
 		u=0;
@@ -211,8 +213,16 @@ done
 rosnode kill /my_bag;		   		
 killall -2 -w  roslaunch ;
 killall -q gzserver
-
+echo "killed gzserver about to kill all terminals"
+#kill -- -$pid
+#wmctrl -F -c segterminal
+#kill gnome-terminal segterminal
+sleep 2
+#killall gnome-terminal
+#echo "killed gnome-terminal"
 #check if last simulation was successfull
 if [ $p == 1 ] && [ -f "$save_path/$name1" ]; then
 mv "$save_path"/"$name1" "$save_path"/"$name2"
 fi
+
+

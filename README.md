@@ -69,9 +69,12 @@ source devel/setup.bash
 
 # USAGE
 ## start multiple worlds  
-cd ~/DeepPx4 ./px4_sim_script_all_worlds_HANNASSCAPES all  
+cd ~/DeepPx4  
+./px4_sim_script_all_worlds_HANNASSCAPES all  
 
-
+check if there is a "segterminal" tab launching the segmentation (after drone take off). the terminal should be open during whole flight! if not,
+there might be a python package missing. follow instructions in "start single world" and check for
+errors in terminal 2)
   
 ## start single world  
 1) terminal  
@@ -86,7 +89,7 @@ rosrun mavros mavsys mode -c OFFBOARD; rosrun mavros mavsafety arm
 2) terminal  
 cd ~/DeepPX4  
 conda activate paddleseg_cpu # if working with virtual environment  
-catkin_make  
+#catkin_make  
 source devel/setup.bash  
 cd ~/DeepPX4/src/Parameter_Tuning/scripts/  
 python parameter_tuner.py  

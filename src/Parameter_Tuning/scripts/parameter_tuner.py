@@ -138,12 +138,20 @@ class Px4Tuner():
         if self._stucked():
             print("DRONE IS STUCKED, DESTUCK MODE")
             params = self._lookup(0) # go in emergency param set if stucked
-        if self._head_toe_goal(angle_thresh=50):
+        if self._head_toe_goal(angle_thresh=30):
             params = self._lookup(4) # go in ascent / decend if goal is directly above or below
-        if self._compute_goal_distance() < 10:
+        if self._compute_goal_distance() < 3:
             if not "params" in locals():
                 params = {}
-            params["velocity_cost_param_"] = 50000
+            params["velocity_cost_param_"] = 500
+            params["yaw_cost_param_"],params["pitch_cost_param_"] = 20,20
+            params["smoothing_speed_z_"],params["smoothing_speed_xy_"] = 1.5,5 
+        elif self._compute_goal_distance() < 10:
+            if not "params" in locals():
+                params = {}
+            params["velocity_cost_param_"] = 1500
+            params["yaw_cost_param_"],params["pitch_cost_param_"] = 20,20
+            params["smoothing_speed_z_"],params["smoothing_speed_xy_"] = 1.5,5 
         print(f"transfer params {params}")
         return params
 
@@ -269,7 +277,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--hz',
         help='refreshing rate',
-        default='2',
+        default='10',
         type=int)
     parser.add_argument(
         '--lut_path',

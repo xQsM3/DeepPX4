@@ -35,6 +35,11 @@ fi
 cp -r launch/HANNASSCAPES "$catkin_ws/src/avoidance/local_planner/launch"
 cp -r worlds/HANNASSCAPES "$catkin_ws/src/avoidance/avoidance/sim/worlds"
 
+echo "catkin make DeepPX4"
+cd ~/DeepPX4  
+catkin_make  
+source devel/setup.bash  
+cd
 
 if [ ! -z "$env" ]
 then
@@ -47,8 +52,13 @@ then
 	pip install rospkg
 	pip install pyquaternion
 	pip install scipy
+	pip install defusedxml
 fi
 
+echo "setup conda"
+conda config --set auto_activate_base false
+source ~/anaconda3/etc/profile.d/conda.sh
+echo "source ~/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc
 echo "export to bashrc script"
 
 export PYTHONPATH=${PYTHONPATH}:~/DeepPX4/src:~/DeepPX4/src/segmentation
