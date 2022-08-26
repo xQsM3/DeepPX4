@@ -69,7 +69,7 @@ source devel/setup.bash
 
 # USAGE
 ## start multiple worlds  
-cd ~/DeepPx4  
+cd ~/DeepPX4  
 ./px4_sim_script_all_worlds_HANNASSCAPES all  
 
 check if there is a "segterminal" tab launching the segmentation (after drone take off). the terminal should be open during whole flight! if not,
