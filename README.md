@@ -68,7 +68,13 @@ catkin_make
 source devel/setup.bash  
 
 # USAGE
-## start multiple worlds  
+## start multiple worlds
+cd ~/catkin_ws  
+catkin build -w ~/catkin_ws # if not build yet  
+source ~/catkin_ws/devel/setup.bash  
+cd ~/Firmware  # change this if you install firmware somewhere else
+source Tools/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default  
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd):$(pwd)/Tools/sitl_gazebo   
 cd ~/DeepPX4  
 ./px4_sim_script_all_worlds_HANNASSCAPES all  
 
