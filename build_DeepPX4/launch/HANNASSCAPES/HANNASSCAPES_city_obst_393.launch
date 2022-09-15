@@ -12,4 +12,12 @@
    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find local_planner)/resource/custom_rosconsole.conf" />
    <arg default="local_planner_manager" name="manager" />
    <node args="manager" name="$(arg manager)" output="screen" pkg="nodelet" type="nodelet" />
-   <node
+   <node args="load LocalPlannerNodelet $(arg manager)" name="local_planner_nodelet" output="screen" pkg="nodelet" type="nodelet">
+      <param name="goal_x_param" value="224" />
+      <param name="goal_y_param" value="0" />
+      <param name="goal_z_param" value="5" />
+      <param name="world_name" value="$(find avoidance)/sim/worlds/HANNASSCAPES/$(arg world_file_name).yaml" />
+      <rosparam param="pointcloud_topics" subst_value="True">$(arg pointcloud_topics)</rosparam>
+   </node>
+   <node args="-d $(find local_planner)/resource/local_planner.rviz" name="rviz" output="screen" pkg="rviz" type="rviz" />
+</launch>
