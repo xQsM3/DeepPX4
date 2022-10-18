@@ -125,11 +125,11 @@ class Px4Tuner():
         print(f"above 50% skyvision in %: {self._class_share(im,0.5)[self._labelID('sky')]}")
         print(f"above 10% skyvision in %: {self._class_share(im,0.1)[self._labelID('sky')]}")
         # analyze segmentation state and suggest px4 parameters
-        if self._class_share(im,0.5)[self._labelID("sky")] > 0.8: # if x% of "horizon" strip (upper 50% of image) is from class sky
+        if self._class_share(im,0.5)[self._labelID("sky")] > 0.9: # if x% of "horizon" strip (upper 50% of image) is from class sky
             params = self._lookup(0) # use simple world params
-        elif self._class_share(im,0.1)[self._labelID("sky")] > 0.25: # if x0% of y% upper strip if sky
+        elif self._class_share(im,0.5)[self._labelID("sky")] > 0.7: # if x0% of y% upper strip if sky
             params = self._lookup(1) # use small city params
-        elif self._class_share(im,0.5)[self._labelID("sky")] < 0.1: # if almost all horozion view is blocked, assume big city
+        elif self._class_share(im,0.5)[self._labelID("sky")] < 0.3: # if almost all horozion view is blocked, assume big city
             params = self._lookup(3)
         else: # else assume middle sized city
             params = self._lookup(2)
@@ -138,6 +138,8 @@ class Px4Tuner():
         if self._stucked():
             print("DRONE IS STUCKED, DESTUCK MODE")
             params = self._lookup(0) # go in emergency param set if stucked
+
+        '''
         if self._head_toe_goal(angle_thresh=30):
             params = self._lookup(4) # go in ascent / decend if goal is directly above or below
         if self._compute_goal_distance() < 3:
@@ -151,7 +153,8 @@ class Px4Tuner():
                 params = {}
             params["velocity_cost_param_"] = 1500
             params["yaw_cost_param_"],params["pitch_cost_param_"] = 20,20
-            params["smoothing_speed_z_"],params["smoothing_speed_xy_"] = 1.5,5 
+            params["smoothing_speed_z_"],params["smoothing_speed_xy_"] = 1.5,5
+        '''
         print(f"transfer params {params}")
         return params
 
@@ -216,6 +219,7 @@ class Px4Tuner():
         return strip
 
     def _stucked(self,approach_limit=10,intersec_limit=3,fixfor=10):
+        # if polyline of xy plane projected trajectory intersects often, drone is stucked
         if self._ascending:
             return False
         if len(self.path.SelfApproaches(epsilon=1) ) > approach_limit:
@@ -277,7 +281,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--hz',
         help='refreshing rate',
-        default='10',
+        default='100',
         type=int)
     parser.add_argument(
         '--lut_path',
