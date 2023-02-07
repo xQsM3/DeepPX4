@@ -22,7 +22,6 @@ echo "in nodelet"
 
 #setting inputs to variables
 launchfile=${1?$(tput setaf 1)Error: no launchfile given$(tput setaf 7)}
-device=${2?$(tput setaf 1)Error: no device given$(tput setaf 7)}
 
 #init
 p=1
@@ -36,12 +35,6 @@ l=1
 #creating resutls folder
 save_path="$dir/bagfiles_all_worlds";
 mkdir -p $save_path;	### creating bagifiles directory ###
-mkdir -p "$dir/bagfiles_all_worlds/tlog";
-mkdir -p "$dir/bagfiles_all_worlds/tlog/ros";
-mkdir -p "$dir/bagfiles_all_worlds/tlog/seg";
-mkdir -p "$dir/bagfiles_all_worlds/tlog/dynamic_rec";
-mkdir -p "$dir/bagfiles_all_worlds/tlog/dynamic_rec2";
-
 
 run=true;
 
@@ -60,7 +53,6 @@ do
 	goal_y=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_y_param']/@value" "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
 	goal_z=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_z_param']/@value" "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
 	goal=("$goal_x","$goal_y","$goal_z")
-	echo $goal_z
 
 	# Time Limits
 	TIME_LIMIT=$(echo "(($goal_x*11000/50)*90)/10000+60" | bc )
@@ -74,7 +66,7 @@ do
 	#start simulation
 	echo "start local_planner"
 
-	xterm -hold -e "roslaunch local_planner $launchfile >> '$save_path/tlog/ros/$name1.txt' 2>&1" &
+	xterm -hold -e roslaunch local_planner $launchfile &
 	ros_pid="$!" # store process pid for later killing    
 	sleep 10
 	if    ### checking for errors at the beginning ###
@@ -87,26 +79,26 @@ do
 	then continue 
 	else	### setting parameters; recording data; takeoff request; setting first waypoint to 5,0,0 to be able to use negative z-direction ###  					  
 		############ for optimization #####
-		 xterm -hold -e "rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z_takeoff' >> '$save_path/tlog/dynamic_rec/$name1.txt' 2>&1;
-						  timeout 5s rostopic pub -1 /move_base_simple/goal geometry_msgs/PoseStamped '{pose: {position: {x: '$goal_x_takeoff', y: '$goal_y_takeoff', z: '$goal_z_takeoff'}}}' >> '$save_path/tlog/dynamic_rec/$name1.txt' 2>&1;
-						  rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z_takeoff' >> '$save_path/tlog/dynamic_rec/$name1.txt' 2>&1;
-						  rosrun mavros mavsys mode -c OFFBOARD;rosrun mavros mavsafety arm;cd ~/bagfiles_all_worlds >> '$save_path/tlog/dynamic_rec/$name1.txt' 2>&1; 
-						  rosbag record -O '$save_path'/'${name[*]}'.bag /mavros/local_position /mavros/battery /mavros/home_position/home /mavros/local_position/accel /mavros/local_position/pose /mavros/local_position/velocity_body_cov /mavros/local_position/velocity_body /local_planner_nodelet/parameter_descriptions /local_planner_nodelet/parameter_updates /mavros/imu/data_raw /mavros/local_position/velocity_local /drone /path_actual __name:=my_bag  >> '$save_path/tlog/dynamic_rec/$name1.txt' 2>&1" &
+		 xterm -hold -e 'rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z_takeoff';
+						  timeout 5s rostopic pub -1 /move_base_simple/goal geometry_msgs/PoseStamped "{pose: {position: {x: '$goal_x_takeoff', y: '$goal_y_takeoff'}}}";
+						  rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z_takeoff';
+						  rosrun mavros mavsys mode -c OFFBOARD;rosrun mavros mavsafety arm;cd ~/bagfiles_all_worlds; 
+						  rosbag record -O '$save_path'/'${name[*]}'.bag /mavros/local_position /mavros/battery /mavros/home_position/home /mavros/local_position/accel /mavros/local_position/pose /mavros/local_position/velocity_body_cov /mavros/local_position/velocity_body /local_planner_nodelet/parameter_descriptions /local_planner_nodelet/parameter_updates /mavros/imu/data_raw /mavros/local_position/velocity_local /drone /path_actual __name:=my_bag' &
 		dynrec_pid="$!" # store process pid for later killing
-		sleep 5;
-		echo "parameter tuner terminal"
-		xterm -hold -e "cd ~/DeepPX4; catkin_make >> '$save_path/tlog/seg/$name1.txt' 2>&1;
-						source devel/setup.bash >> '$save_path/tlog/seg/$name1.txt' 2>&1;
-						source ~/anaconda3/etc/profile.d/conda.sh >> '$save_path/tlog/seg/$name1.txt' 2>&1; 							conda activate paddleseg_$device >> '$save_path/tlog/seg/$name1.txt' 2>&1;
-						cd ~/DeepPX4/src/Parameter_Tuning/scripts >> '$save_path/tlog/seg/$name1.txt' 2>&1; 
-						python parameter_tuner.py >> '$save_path/tlog/seg/$name1.txt' 2>&1" &
-		seg_pid="$!" # store pid for later killing
 		
+		echo "seg terminal"
+		xterm -hold -e 'cd ~/DeepPX4; catkin_make;
+						source devel/setup.bash;
+						source ~/anaconda3/etc/profile.d/conda.sh; 							conda activate paddleseg_cpu;
+						cd ~/DeepPX4/src/Parameter_Tuning/scripts; 
+						python parameter_tuner.py;' &
+		seg_pid="$!" # store pid for later killing
+
 		sleep 3			
 	fi
 
 	##############
-	u=1; sleep 5;
+	u=1;
 	while [ "$SECONDS" -le "$takeoff_time" ] 	### checking if first waypoint (0,0,5) is reached and set new waypoint (our actual goal) ###
 	do
 	  sleep 0.1; 
@@ -118,18 +110,32 @@ do
 	    (( $(echo "$(echo "$goal_y_takeoff + 1" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) && 
 	    (( $(echo "$(echo "$goal_z_takeoff + 1" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) ) ; 
 	  then
-		xterm -hold -e "rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z'
-		rostopic pub -l /move_base_simple/goal geometry_msgs/PoseStamped '{header: {frame_id: 'local_origin'}, pose: {position: {x: '$goal_x', y: '$goal_y', z: '$goal_z'}}}' >> '$save_path/tlog/dynamic_rec2/$name1.txt' 2>&1" &
- 		dynrec_pid2="$!" # pid store for killing process late
-
+		xterm -hold -e 'rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z';
+		timeout 5s rostopic pub -1 /move_base_simple/goal geometry_msgs/PoseStamped "{pose: {position: {x: '$goal_x', y: '$goal_y'}}}";' &
+		dynrec_pid2="$!" # pid store for killing process late
 		#'rosrun dynamic_reconfigure dynparam set local_planner_nodelet goal_z_param '$goal_z';';
-# rostopic pub -l /goal_position visualization_msgs/MarkerArray '{header: {frame_id: 'local_origin'}, pose: {position: {x: '$goal_x', y: '$goal_y', z: '$goal_z'}}}'
 		u=0;
 		break
 	  fi 
 	done	 
 
- 
+	########################	checking if new goal is successfully set	####################################################################################
+	start_x_coordinate=0;
+	start_y_coordinate=0;
+	start_z_coordinate=5;
+	echo "set new goal"	
+	sleep 20;
+	if
+  ( (( $(echo "$(echo "$start_x_coordinate - 0.3" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&     
+    (( $(echo "$(echo "$start_y_coordinate - 0.3" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&	
+    (( $(echo "$(echo "$start_z_coordinate - 0.3" | bc) < $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&
+    (( $(echo "$(echo "$start_x_coordinate + 0.3" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $4}' |awk 'FNR == 2 {print}')"  | bc -l) )) &&     
+    (( $(echo "$(echo "$start_y_coordinate + 0.3" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $5}' |awk 'FNR == 2 {print}')"  | bc -l) )) && 
+    (( $(echo "$(echo "$start_z_coordinate + 0.3" | bc) > $(timeout 4s rostopic echo -p --nostr --noarr -n1 /mavros/local_position/pose | awk -F',' '{print $6}' |awk 'FNR == 2 {print}')"  | bc -l) )) ) ; 
+	then 	
+		u=1;	
+	fi
+	 
 	######################################################################################################################################
 	if [ $u == 1 ] ; then 
 		continue 	
@@ -143,7 +149,6 @@ do
 	turnover=0;
 	definiton_turn=2;
 	reached_goal=0;
-	echo "z koordinate soll: $goal_z";
 
 	while [ "$SECONDS" -le "$TIME_LIMIT" ]   
 	do     

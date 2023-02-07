@@ -20,80 +20,11 @@ from libs import inf_config
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TwistStamped
 from visualization_msgs.msg import MarkerArray
-class DroneStateListener:
-    def __init__(self,pose_topic,pose_type,vel_topic,vel_type):
-        rospy.Subscriber(pose_topic,pose_type,self.pose_callback) #from nav_msgs.msg import Odometry
-        self.pose_msg = rospy.wait_for_message(pose_topic,pose_type,timeout=20)
+from utils.ros_com import im_array2im_msg,publish_xypath,DroneStateListener,GoalListener,ImageListener
 
-        rospy.Subscriber(vel_topic,vel_type,self.vel_callback) #from nav_msgs.msg import Odometry
-        self.vel_msg = rospy.wait_for_message(vel_topic,vel_type,timeout=20)
-        #"/mavros/local_position/velocity_local"
-    @property
-    def pos(self):
-        x = self.pose_msg.pose.pose.position.x
-        y = self.pose_msg.pose.pose.position.y
-        z = self.pose_msg.pose.pose.position.z
-        #x = self.msg.markers.pose.position.x
-        #y = self.msg.markers.pose.position.y
-        #z = self.msg.markers.pose.position.z
-        pos = kin_utils.Pose(x,y,z)
-        return pos
-
-    @property
-    def vel_linear(self):
-        x = self.vel_msg.twist.linear.x
-        y = self.vel_msg.twist.linear.y
-        z = self.vel_msg.twist.linear.z
-        vel = kin_utils.Velocity(x, y, z)
-        return vel
-
-    def pose_callback(self,msg):
-        self.pose_msg = msg
-    def vel_callback(self,msg):
-        self.vel_msg = msg
-
-class GoalListener:
-    def __init__(self,goal_topic,type):
-        rospy.Subscriber(goal_topic,type,self.pose_callback)
-        self.pose_msg = rospy.wait_for_message(goal_topic,type,timeout=20)
-    @property
-    def pos(self):
-        #x = self.pose_msg.pose.pose.position.x
-        #y = self.pose_msg.pose.pose.position.y
-        #z = self.pose_msg.pose.pose.position.z
-
-        #for m in self.pose_msg.markers:
-        #    print("####")
-        #    print(m)
-        #    print("###")
-        x = self.pose_msg.markers[0].pose.position.x
-        y = self.pose_msg.markers[0].pose.position.y
-        z = self.pose_msg.markers[0].pose.position.z
-        pos = kin_utils.Pose(x,y,z)
-        return pos
-
-    @property
-    def vel_linear(self):
-        x = self.vel_msg.twist.linear.x
-        y = self.vel_msg.twist.linear.y
-        z = self.vel_msg.twist.linear.z
-        vel = kin_utils.Velocity(x, y, z)
-        return vel
-
-    def pose_callback(self,msg):
-        self.pose_msg = msg
-    def vel_callback(self,msg):
-        self.vel_msg = msg
-
-class ImageListener:
-    def __init__(self,image_topic):
-        rospy.Subscriber(image_topic,Image,self.callback)
-        self.im_msg = rospy.wait_for_message(image_topic,Image,timeout=20)
-    def callback(self,im_msg):
-        self.im_msg = im_msg
 class Px4Tuner():
     '''
-    class which handles the parameter tuning of px4
+    handles the parameter tuning of px4
     looks up best parameters for current segmentation state,
     and requests ros service to adjust parameters
     '''
@@ -108,7 +39,8 @@ class Px4Tuner():
                                         vel_topic="/mavros/local_position/velocity_local",vel_type=TwistStamped)
         self.goal = GoalListener(goal_topic="/goal_position", type=MarkerArray)
 
-        self.path = math_utils.Polyline([(self.drone.pos.x,self.drone.pos.y)]) # drone path
+        self.path = math_utils.Polyline([(self.drone.pos.x,self.drone.pos.y,
+                                          self.drone.pos.z,rospy.get_time())]) # drone path
         self._fixing_stucked = 0
     def request_parameter_change(self,im):
         params = self._analyze_state(im)
@@ -118,13 +50,14 @@ class Px4Tuner():
         except rospy.ServiceException as e:
             print("failed ParamSet")
     def _ascending(self):
-        return True if abs(self.drone.vel_linear.z) >= 0.1 else False
+        return True if abs(self.drone.vel_linear.z) >= 0.06 else False
     def _analyze_state(self,im):
         self._update_path()
         print("PARAMETER TUNING")
         print(f"above 50% skyvision in %: {self._class_share(im,0.5)[self._labelID('sky')]}")
         print(f"above 10% skyvision in %: {self._class_share(im,0.1)[self._labelID('sky')]}")
         # analyze segmentation state and suggest px4 parameters
+        
         if self._class_share(im,0.5)[self._labelID("sky")] > 0.8: # if x% of "horizon" strip (upper 50% of image) is from class sky
             params = self._lookup(0) # use simple world params
         elif self._class_share(im,0.1)[self._labelID("sky")] > 0.9: # if x0% of y% upper strip if sky
@@ -202,17 +135,16 @@ class Px4Tuner():
         strip = im[0:height_strip,:]
         return strip
 
-    def _stucked(self,approach_limit=10,intersec_limit=3,fixfor=10):
-        # if polyline of xy plane projected trajectory intersects often, drone is stucked
-        if self._ascending:
-            return False
-        if len(self.path.SelfApproaches(epsilon=1) ) > approach_limit:
-            self._fixing_stucked +=1
-            if self._fixing_stucked >= fixfor:
-                self._fixing_stucked = 0
-                self.path = math_utils.Polyline([(self.drone.pos.x, self.drone.pos.y)])  # reset drone path recording
-            return True
-        if len(self.path.SelfIntersections()) > intersec_limit: # if path self intersections reached
+    def _stucked(self,approach_limit=10,intersec_limit=2,fixfor=5):
+        intersections = self.path.SelfIntersections() # determine intersections
+        # post process intersections, pop out intersections which do not match criteria
+        intersections = math_utils.postprocess_intersections(intersections, timethresh=10, z_thresh=1)
+        approaches = self.path.SelfApproaches(distancethresh=1,timethresh=10)
+
+        publish_xypath(self.path, intersections,
+                       approaches, self._fixing_stucked)  # draw path and intersections, publish
+
+        if len(intersections) > intersec_limit: # if path self intersections reached
             self._fixing_stucked += 1
             if self._fixing_stucked >= fixfor:
                 self._fixing_stucked = 0
@@ -220,36 +152,26 @@ class Px4Tuner():
             return True
         return False
     def _update_path(self):
-        self.path.Add(self.drone.pos.x,self.drone.pos.y)
-
-def get_color_map(model_config_path):
-    model_config = inf_config.ConfigArgs(model_config_path)
-    return visualize.get_color_map_list(256, custom_color=model_config.custom_color)
+        self.path.Add(self.drone.pos.x,self.drone.pos.y,
+                      self.drone.pos.z,rospy.get_time())
 
 def tuning_loop(image_topic, hz, lut_path,model_config_path):
-    pub = segmentation_publisher()
+    seg_pub = rospy.Publisher("segmentation_image",Image,queue_size=10)
     tune = Px4Tuner(lut_path=lut_path,model_config=model_config_path,labels=pargs.labels)
     rate = rospy.Rate(hz)
-    color_map = get_color_map(model_config_path)
+    color_map = visualize.get_color_map(model_config_path)
     im_listener = ImageListener(image_topic)
     while not rospy.is_shutdown():
         # get segmentation
         pred = seg_client.segmentation_client(image_topic,im_listener.im_msg)
         # publish colored segmentation
         pred_colored = visualize.addcolor(pred,color_map)
-        if fix_melodic.CvBridgeMelodic().fix_needed():
-            im_msg = fix_melodic.CvBridgeMelodic().cv2_to_imgmsg(pred_colored,encoding="bgr8")
-        else:
-            im_msg = CvBridge().cv2_to_imgmsg(pred_colored,encoding="passthrough")
-        pub.publish(im_msg)
+        im_msg = im_array2im_msg(pred_colored)
+        seg_pub.publish(im_msg)
         #calculate new px4 parameters and publish
         tune.request_parameter_change(pred)
 
         rate.sleep()
-
-def segmentation_publisher():
-    pub = rospy.Publisher("segmentation_image",Image,queue_size=10)
-    return pub
 
 def usage():
     return f"args should be [image_topic,hz]"
@@ -265,7 +187,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--hz',
         help='refreshing rate',
-        default='100',
+        default='10',
         type=int)
     parser.add_argument(
         '--lut_path',

@@ -25,7 +25,17 @@ KOMMENTARIO
 echo "Skript started"
 
 launchname=${1?$(tput setaf 1)Error: no launchname or textfile given (eg. simple_obst or check_missing)$(tput setaf 7)}
- 
+device=${2?$(tput setaf 1)Error: give device type, cpu or gpu$(tput setaf 7)}
+
+
+echo e
+if [ $device != "cpu" ] && [ $device != "gpu" ];
+then
+  printf '%s\n' "ValueError: device must be either cpu or gpu, you typed $device" >&2  # write error message to stderr
+  exit 1                                  # or exit $test_result
+fi
+
+
 	start=1;
 
 	if [[ $launchname == "simple_obst" ]]; then
@@ -72,7 +82,7 @@ launchname=${1?$(tput setaf 1)Error: no launchname or textfile given (eg. simple
 				fi 
 				 
 				t=$(echo "($t+1)" | bc) 
-		 		./px4_sim_script_all_worlds_nodelet_HANNASSCAPES $launchfile;
+		 		./px4_sim_script_all_worlds_nodelet_HANNASSCAPES $launchfile $device;
 				
 				#conda activate paddleseg_cpu
 				#cd ~/DeepPX4/src/scripts
@@ -100,5 +110,7 @@ launchname=${1?$(tput setaf 1)Error: no launchname or textfile given (eg. simple
 			 
 			t=$(echo "($t+1)" | bc) 
 	 		./px4_sim_script_all_worlds_nodelet_HANNASSCAPES $launchfile;
+			wait < <(jobs -p)
+			sleep 2
 		done
 	fi

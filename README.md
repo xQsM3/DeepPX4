@@ -76,7 +76,7 @@ cd ~/Firmware  # change this if you install firmware somewhere else
 source Tools/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default  
 export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd):$(pwd)/Tools/sitl_gazebo   
 cd ~/DeepPX4  
-./px4_sim_script_all_worlds_HANNASSCAPES all  
+./px4_sim_script_all_worlds_HANNASSCAPES all cpu  
 
 check if there is a "segterminal" tab launching the segmentation (after drone take off). the terminal should be open during whole flight! if not,
 there might be a python package missing. follow instructions in "start single world" and check for

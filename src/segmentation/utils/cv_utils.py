@@ -1,13 +1,14 @@
 import cv2 as cv
 import numpy as np
 
-def boolean_mask_from_cls_mask(cls_mask,cls_id):
+def boolean_mask_from_cls_mask(cls_mask: np.ndarray,
+                               cls_id: np.ndarray) ->np.ndarray:
     bool_mask = cls_mask.copy()
     bool_mask[bool_mask==255] = 999 # no class found
     bool_mask[bool_mask==cls_id] = 255
     bool_mask[bool_mask!=255] = 0
     return bool_mask
-def erode(mask):
+def erode(mask: np.ndarray) -> np.ndarray:
     kernel = np.ones((3, 3), np.uint8)
     mask = cv.erode(mask,kernel,iterations=40)
     return mask

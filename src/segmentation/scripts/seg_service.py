@@ -22,6 +22,7 @@ def handle_segmentation(msg):
     else:
         im = CvBridge().imgmsg_to_cv2(msg.segimage.image,desired_encoding="bgr8")
 
+    #im = cv.resize(im, (0,0), fx=scale, fy=scale)
     pred = model(im)
 
     # prepare seg message

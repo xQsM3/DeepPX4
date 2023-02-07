@@ -41,6 +41,7 @@ class NN:
             place = 'cpu'
 
         paddle.set_device(place)
+        print(f"set device: {place}")
 
     def __call__(self,im):
         with paddle.no_grad():
