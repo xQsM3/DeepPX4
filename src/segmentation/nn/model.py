@@ -10,6 +10,9 @@ import paddle
 import numpy as np
 
 from utils.visualize import addcolor
+class DeviceUnavailabeError(Exception):
+    "raised when device is not reachable"
+    pass
 
 class NN:
     def __init__(self,args):
@@ -42,6 +45,8 @@ class NN:
 
         paddle.set_device(place)
         print(f"set device: {place}")
+        if place != self.args.device:
+            raise DeviceUnavailabeError(f"device {self.args.device} not reachable")
 
     def __call__(self,im):
         with paddle.no_grad():

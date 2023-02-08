@@ -6,6 +6,7 @@ import sys
 import rospy,rospkg
 from segmentation.srv import *
 from segmentation.msg import SegImage
+from std_msgs.msg import _Float32
 from sensor_msgs.msg import Image
 
 import cv2 as cv
@@ -13,16 +14,15 @@ from cv_bridge import CvBridge
 from utils.fix_melodic import CvBridgeMelodic
 
 
-def segmentation_client(image_topic,im_msg):
-    # get image from drone camera
+def segmentation_client(image_topic,im_msg,scale):
+    # prepare seg message
     seg_msg = SegImage()
     seg_msg.image = im_msg
     seg_msg.header.stamp = rospy.Time.now()
     rospy.wait_for_service("segmentation",timeout=20)
-
     try:
         seg = rospy.ServiceProxy("segmentation",Segmentation)
-        pred_msg = seg(seg_msg) # get segmentation from seg model service
+        pred_msg = seg(seg_msg,scale) # get segmentation from seg model service
         if CvBridgeMelodic().fix_needed():
             pred = CvBridgeMelodic().imgmsg_to_cv2(pred_msg.segimage.image, desired_encoding="passthrough")
         else:

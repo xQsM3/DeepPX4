@@ -155,7 +155,7 @@ class Px4Tuner():
         self.path.Add(self.drone.pos.x,self.drone.pos.y,
                       self.drone.pos.z,rospy.get_time())
 
-def tuning_loop(image_topic, hz, lut_path,model_config_path):
+def tuning_loop(image_topic, hz, lut_path,model_config_path,scale):
     seg_pub = rospy.Publisher("segmentation_image",Image,queue_size=10)
     tune = Px4Tuner(lut_path=lut_path,model_config=model_config_path,labels=pargs.labels)
     rate = rospy.Rate(hz)
@@ -163,7 +163,7 @@ def tuning_loop(image_topic, hz, lut_path,model_config_path):
     im_listener = ImageListener(image_topic)
     while not rospy.is_shutdown():
         # get segmentation
-        pred = seg_client.segmentation_client(image_topic,im_listener.im_msg)
+        pred = seg_client.segmentation_client(image_topic,im_listener.im_msg,scale=scale)
         # publish colored segmentation
         pred_colored = visualize.addcolor(pred,color_map)
         im_msg = im_array2im_msg(pred_colored)
@@ -188,6 +188,11 @@ if __name__ == "__main__":
         '--hz',
         help='refreshing rate',
         default='10',
+        type=int)
+    parser.add_argument(
+        '--scale',
+        help='scale of segmentation model input image, 1 and 0.5 tested ',
+        default='1',
         type=int)
     parser.add_argument(
         '--lut_path',
@@ -219,4 +224,4 @@ if __name__ == "__main__":
     launch.start()
     process = launch.launch(node)
 
-    tuning_loop(pargs.image_topic, pargs.hz, pargs.lut_path, pargs.config)
+    tuning_loop(pargs.image_topic, pargs.hz, pargs.lut_path, pargs.config,pargs.scale)
