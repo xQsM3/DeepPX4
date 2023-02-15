@@ -35,9 +35,9 @@ then
   exit 1                                  # or exit $test_result
 fi
 
-
+	
 	start=1;
-
+	echo $launchname
 	if [[ $launchname == "simple_obst" ]]; then
 		end=900
 	elif [[ $launchname == "natural_obst" ]]; then
@@ -45,10 +45,11 @@ fi
 	elif [[ $launchname == "city_obst" ]]; then
 		end=1408
 	else
+		
 		end=0
 	fi
 	
-	if [[ end==0 ]]; then
+	if [[ $launchname == "all" ]]; then #[[ end==0 ]]; then
 		for i in 1 2 3
 		do
 			case $i in
@@ -65,7 +66,7 @@ fi
 			goal_x=(default) 
 			goal_y=(default) 
 			goal_z=(default) 
-			t=$start 
+			t=$start
 			dir=$(eval echo ~$USER)
 		 
 			echo "start launch file"
@@ -99,9 +100,9 @@ fi
 	 
 		while (( $t <= $end )) 
 		 do  
-			launchfile=("$launchname"_"$t".launch); 
-	 
-			if [ ! -f "$dir"/catkin_ws/src/avoidance/local_planner/launch/"$launchfile" ]; then	### cheking if given launchfile exists/is in the correct directory ### 
+			launchfile=("HANNASSCAPES_$launchname"_"$t".launch); 
+	 		
+			if [ ! -f "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile" ]; then	### cheking if given launchfile exists/is in the correct directory ### 
 			    tput setaf 1; echo "Error:launchfile not found!" ;tput setaf 7; 
 			    echo "Enterd: $launchname "; 
 			    printf "Searched launchfile: %s\n" "$launchfile" 
@@ -109,7 +110,7 @@ fi
 			fi 
 			 
 			t=$(echo "($t+1)" | bc) 
-	 		./px4_sim_script_all_worlds_nodelet_HANNASSCAPES $launchfile;
+	 		./px4_sim_script_all_worlds_nodelet_HANNASSCAPES $launchfile $device;
 			wait < <(jobs -p)
 			sleep 2
 		done
