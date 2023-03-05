@@ -76,7 +76,8 @@ class Evaluator:
             self.add_sim(bag, "all", sub_evaluation)
             self.add_sim(bag,subworldtype,sub_evaluation)
 
-        pd.set_option('max_columns', None)
+        #pd.set_option('max_columns', None)
+        pd.set_option('display.max_columns', 100)
         return pd.DataFrame.from_dict(full_evaluation),pd.DataFrame.from_dict(sub_evaluation)
 
     def categories_subtype(self,num_code):

@@ -42,6 +42,7 @@ class Px4Tuner():
         self.path = math_utils.Polyline([(self.drone.pos.x,self.drone.pos.y,
                                           self.drone.pos.z,rospy.get_time())]) # drone path
         self._fixing_stucked = 0
+        self._true_goal = self.goal.pos
     def request_parameter_change(self,im):
         params = self._analyze_state(im)
         try:
@@ -57,7 +58,11 @@ class Px4Tuner():
         print(f"above 50% skyvision in %: {self._class_share(im,0.5)[self._labelID('sky')]}")
         print(f"above 10% skyvision in %: {self._class_share(im,0.1)[self._labelID('sky')]}")
         # analyze segmentation state and suggest px4 parameters
-        
+        if self._class_share(im,0.2)[self._labelID("sky")] < 0.8:
+                params = self._lookup(3)
+        else:
+                params = self._lookup(0)
+        '''
         if self._class_share(im,0.5)[self._labelID("sky")] > 0.8: # if x% of "horizon" strip (upper 50% of image) is from class sky
             params = self._lookup(0) # use simple world params
         elif self._class_share(im,0.1)[self._labelID("sky")] > 0.9: # if x0% of y% upper strip if sky
@@ -66,11 +71,12 @@ class Px4Tuner():
             params = self._lookup(3)
         else: # else assume middle sized city
             params = self._lookup(2)
-
+        '''
         # special cases
         if self._stucked():
             print("DRONE IS STUCKED, DESTUCK MODE")
             params = self._lookup(0) # go in emergency param set if stucked
+            params["pitch_cost_param"] = 0.
 
         print(f"transfer params {params}")
         return params
@@ -138,8 +144,8 @@ class Px4Tuner():
     def _stucked(self,approach_limit=10,intersec_limit=2,fixfor=5):
         intersections = self.path.SelfIntersections() # determine intersections
         # post process intersections, pop out intersections which do not match criteria
-        intersections = math_utils.postprocess_intersections(intersections, timethresh=10, z_thresh=1)
-        approaches = self.path.SelfApproaches(distancethresh=1,timethresh=10)
+        intersections = math_utils.postprocess_intersections(intersections, timethresh=20, z_thresh=30)
+        approaches = self.path.SelfApproaches(distancethresh=10,timethresh=20)
 
         publish_xypath(self.path, intersections,
                        approaches, self._fixing_stucked)  # draw path and intersections, publish
@@ -192,8 +198,8 @@ if __name__ == "__main__":
     parser.add_argument(
         '--scale',
         help='scale of segmentation model input image, 1 and 0.5 tested ',
-        default='1',
-        type=int)
+        default='1.',
+        type=float)
     parser.add_argument(
         '--lut_path',
         help='look up table path',
