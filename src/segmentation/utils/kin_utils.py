@@ -29,4 +29,4 @@ class Pose:
 
 class Velocity(Pose):
     def __init__(self,x,y,z):
-        super().__init__()
+        super().__init__(x,y,z)

@@ -50,7 +50,7 @@ class Polyline:
 
     def SelfApproaches(self,distancethresh,timethresh):
         approaches = []
-        timethresh *= 1000 #miliseconds
+        #timethresh *= 1000 #miliseconds
         for p in self.polyline_points[1:]:
             for q in self.polyline_points:
                 p_array = np.array([p.x,p.y,p.z])
@@ -85,18 +85,15 @@ class Polyline:
 def postprocess_intersections(intersects,timethresh,z_thresh):
     # this function sorts out intersections which are too close in timestamps or
     # segments are too far in z direction
-    timethresh *= 1000  # miliseconds
+    #timethresh *= 1000  # miliseconds
     for i in intersects.copy():
         # segments of intersection
         seg_p = i[2]
         seg_q = i[3]
         #if time condition or z condition hurt
         if abs(seg_p.p1.timestamp - seg_q.p1.timestamp) <= timethresh or \
-            abs(seg_p.p1.z-seg_q.p1.z) <= z_thresh:
+            abs(seg_p.p1.z-seg_q.p1.z) >= z_thresh:
             intersects.remove(i)
-        else:
-            print(f"time diff {abs(seg_p.timestamp - seg_q.timestamp)}"
-                  f"h diff {abs(seg_p.z-seg_q.z)}")
 
     return intersects
 
