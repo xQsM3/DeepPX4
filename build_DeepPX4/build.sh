@@ -34,6 +34,7 @@ if [ ! -d "$catkin_ws/src/avoidance" ]; then
 fi
 cp -r launch/HANNASSCAPES "$catkin_ws/src/avoidance/local_planner/launch"
 cp -r worlds/HANNASSCAPES "$catkin_ws/src/avoidance/avoidance/sim/worlds"
+cp -r LocalPlannerNode.cfg "$catkin_ws/src/avoidance/local_planner/cfg"
 
 echo "catkin make DeepPX4"
 cd ~/DeepPX4  

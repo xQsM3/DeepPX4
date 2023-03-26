@@ -42,12 +42,12 @@ class Px4Tuner():
         self.path = math_utils.Polyline([(self.drone.pos.x,self.drone.pos.y,
                                           self.drone.pos.z,rospy.get_time())]) # drone path
         self._fixing_stucked = 0
-        self._true_goal = self.goal.pos
+        self._true_goal_z = self.goal.pos.z
     def request_parameter_change(self,im):
         params = self._analyze_state(im)
         try:
             config = self.change_params.update_configuration(params)
-            print("ParamSet successfull")
+            print(f"ParamSet successfull: {config}")
         except rospy.ServiceException as e:
             print("failed ParamSet")
     def _ascending(self):
@@ -59,21 +59,25 @@ class Px4Tuner():
         print(f"above 10% skyvision in %: {self._class_share(im,0.1)[self._labelID('sky')]}")
         # analyze segmentation state and suggest px4 parameters
         if self._class_share(im,0.2)[self._labelID("sky")] < 0.8:
-                params = self._lookup(3)
+            params = self._lookup(3)
+            if self._stucked():
+                params["goal_z_param"] = self.goal.pos.z + 2  # max in config is 300
         else:
-                params = self._lookup(0)
+            params = self._lookup(0)
+            params["goal_z_param"] = self.drone.pos.z
 
-        # special cases
-        if False: #not implemented yet self._stucked():
-            print("DRONE IS STUCKED, DESTUCK MODE")
-            params = self._lookup(0) # go in emergency param set if stucked
-
+        # near to goal parameters
+        if self._compute_goal_distance(xy=True) < 30: #not implemented yet self._stucked():
+            params["goal_z_param"] = self._true_goal_z
         print(f"transfer params {params}")
+
         return params
 
-    def _compute_goal_distance(self):
+    def _compute_goal_distance(self,xy=False):
         goal_pose = self.goal.pos.pos_asarray
         drone_pose = self.drone.pos.pos_asarray
+        if xy: #compute distance in xy plane
+            goal_pose[2],drone_pose[2] = 0,0
         return np.linalg.norm(goal_pose-drone_pose)
 
     def _compute_goal_angle_arroundaxis(self,axis="z"):
@@ -131,22 +135,22 @@ class Px4Tuner():
         strip = im[0:height_strip,:]
         return strip
 
-    def _stucked(self,approach_limit=10,intersec_limit=3,fixfor=5):
+    def _stucked(self,approach_limit=10,intersec_limit=1,fixfor=5):
+        # get intersections
         intersections = self.path.SelfIntersections() # determine intersections
-        # post process intersections, pop out intersections which do not match criteria
-        intersections = math_utils.postprocess_intersections(intersections, timethresh=10, z_thresh=5)
-        #approaches = self.path.SelfApproaches(distancethresh=10,timethresh=20)
-
+        intersections = math_utils.postprocess_intersections(intersections, timethresh=15, z_thresh=100)
         publish_xypath(self.path, intersections,
-                       [], self._fixing_stucked)  # draw path and intersections, publish, approaches not implemented yet
-
-        if len(intersections) > intersec_limit and not self._hover(): # if path self intersections reached
+                       [], self._fixing_stucked)
+        print(len(intersections) >= intersec_limit,self._hover())
+        if len(intersections) >= intersec_limit and not self._hover():
+            '''
             self._fixing_stucked += 1
             if self._fixing_stucked >= fixfor:
                 self._fixing_stucked = 0
-                self.path = math_utils.Polyline([(self.drone.pos.x, self.drone.pos.y,
-                                                  self.drone.pos.z,
-                                                  rospy.get_time())]) # reset drone path recording
+            self.path = math_utils.Polyline([(self.drone.pos.x, self.drone.pos.y,
+                                              self.drone.pos.z,
+                                              rospy.get_time())]) # reset drone path recording
+            '''
             return True
         return False
     def _update_path(self):

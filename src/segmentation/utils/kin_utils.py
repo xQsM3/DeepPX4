@@ -23,9 +23,9 @@ class Pose:
     @property
     def z(self):
         return self._z
-    @x.setter
+    @z.setter
     def z(self,z):
-        self._z = self._z
+        self._z = z
 
 class Velocity(Pose):
     def __init__(self,x,y,z):
