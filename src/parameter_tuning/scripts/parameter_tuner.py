@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 import math
-import sys
+import sys,os
 import json
 import rospy,roslaunch,rospkg
 from utils import seg_client,fix_melodic
@@ -28,11 +28,11 @@ class Px4Tuner():
     looks up best parameters for current segmentation state,
     and requests ros service to adjust parameters
     '''
-    def __init__(self,lut_path,model_config,labels):
+    def __init__(self,model_config,labels,dynreconfigure_name,goal_z):
         rospy.init_node("px4_parameter_tuner")
-        self._LUT = self._load_table(lut_path)
+        self._LUT = self._load_table()
         self._cls_num, self._clss = self._get_clss(model_config)
-        self.change_params = dynamic_reconfigure.client.Client("local_planner_nodelet")
+        self.change_params = dynamic_reconfigure.client.Client(dynreconfigure_name)
         self._labels = self._load_labels(labels)
 
         self.drone = DroneStateListener(pose_topic="/mavros/global_position/local", pose_type=Odometry,
@@ -42,7 +42,7 @@ class Px4Tuner():
         self.path = math_utils.Polyline([(self.drone.pos.x,self.drone.pos.y,
                                           self.drone.pos.z,rospy.get_time())]) # drone path
         self._fixing_stucked = 0
-        self._true_goal_z = self.goal.pos.z
+        self._true_goal_z = goal_z
     def request_parameter_change(self,im):
         params = self._analyze_state(im)
         try:
@@ -64,11 +64,11 @@ class Px4Tuner():
                 params["goal_z_param"] = self.goal.pos.z + 2  # max in config is 300
         else:
             params = self._lookup(0)
-            params["goal_z_param"] = self.drone.pos.z
+            #params["goal_z_param"] = self.drone.pos.z
 
         # near to goal parameters
-        if self._compute_goal_distance(xy=True) < 30: #not implemented yet self._stucked():
-            params["goal_z_param"] = self._true_goal_z
+        #if self._compute_goal_distance(xy=True) < 30: #not implemented yet self._stucked():
+        #    params["goal_z_param"] = self._true_goal_z
         print(f"transfer params {params}")
 
         return params
@@ -119,7 +119,8 @@ class Px4Tuner():
         with open(label_path) as json_file:
             labels = json.load(json_file)
         return labels
-    def _load_table(self, lut_path):
+    def _load_table(self):
+        lut_path = os.path.join(rospkg.RosPack().get_path("parameter_tuning"),"scripts/lut.csv")
         df = pd.read_csv(lut_path)
         return df
 
@@ -163,9 +164,9 @@ class Px4Tuner():
             return True
         else:
             return False
-def tuning_loop(image_topic, hz, lut_path,model_config_path,scale):
+def tuning_loop(image_topic, hz,model_config_path,scale,dynreconfigure_name,goal_z):
     seg_pub = rospy.Publisher("segmentation_image",Image,queue_size=10)
-    tune = Px4Tuner(lut_path=lut_path,model_config=model_config_path,labels=pargs.labels)
+    tune = Px4Tuner(model_config=model_config_path,labels=pargs.labels,dynreconfigure_name=dynreconfigure_name,goal_z=goal_z)
     rate = rospy.Rate(hz)
     color_map = visualize.get_color_map(model_config_path)
     im_listener = ImageListener(image_topic)
@@ -181,11 +182,13 @@ def tuning_loop(image_topic, hz, lut_path,model_config_path,scale):
 
         rate.sleep()
 
-def usage():
-    return f"args should be [image_topic,hz]"
-
+def read_rosparams(args):
+    try:
+        args.dynreconfigure_name = rospy.get_param("px4_parameter_tuner/dynreconfigure_name")
+    except:
+        pass
+    return args
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description='')
     parser.add_argument(
         '--image_topic',
@@ -203,11 +206,6 @@ if __name__ == "__main__":
         default='1.',
         type=float)
     parser.add_argument(
-        '--lut_path',
-        help='look up table path',
-        default='lut.csv',
-        type=str)
-    parser.add_argument(
         '--config',
         help='seg model config',
         default='configs/ppliteseg_hannasscapes.yml',
@@ -222,8 +220,25 @@ if __name__ == "__main__":
         help='device for NN model either cpu or gpu',
         default='cpu',
         type=str)
-    pargs = parser.parse_args()
+    parser.add_argument(
+        '--dynreconfigure_name',
+        help='name of dynamic reconfigure nodelet topic',
+        default="local_planner_nodelet",
+        type=str)
+    parser.add_argument(
+        '--goal_z',
+        type=float)
 
+
+
+
+    try:
+        pargs = parser.parse_args()
+    except:
+        pargs, unknown = parser.parse_known_args()
+    pargs = read_rosparams(pargs) # read parameters from launch file, if tuner was started by roslaunch
+
+    # start segmentaiton node @todo: change this to launch file
     package = 'segmentation'
     executable = 'seg_service.py'
     node_name = 'segmentation_server'
@@ -232,4 +247,4 @@ if __name__ == "__main__":
     launch.start()
     process = launch.launch(node)
 
-    tuning_loop(pargs.image_topic, pargs.hz, pargs.lut_path, pargs.config,pargs.scale)
+    tuning_loop(pargs.image_topic, pargs.hz, pargs.config,pargs.scale,pargs.dynreconfigure_name,pargs.goal_z)

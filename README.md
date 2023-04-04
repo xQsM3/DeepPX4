@@ -95,9 +95,9 @@ rosrun mavros mavsys mode -c OFFBOARD; rosrun mavros mavsafety arm
 2) terminal  
 cd ~/DeepPX4  
 conda activate paddleseg_cpu # if working with virtual environment  
-#catkin_make  
+catkin_make  
 source devel/setup.bash  
-cd ~/DeepPX4/src/Parameter_Tuning/scripts/  
+cd ~/DeepPX4/src/parameter_tuning/scripts/  
 python parameter_tuner.py  
 
   
