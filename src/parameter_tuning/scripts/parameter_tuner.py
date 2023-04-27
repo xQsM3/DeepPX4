@@ -60,19 +60,22 @@ class Px4Tuner():
         # analyze segmentation state and suggest px4 parameters
         if self._class_share(im,0.2)[self._labelID("sky")] < 0.8:
             params = self._lookup(3)
-            if self._stucked():
-                params["goal_z_param"] = self.goal.pos.z + 2  # max in config is 300
+            #if self._stucked():
+            params["goal_z_param"] = self.tune_goalz(climb_angle=18)
         else:
             params = self._lookup(0)
-            #params["goal_z_param"] = self.drone.pos.z
+            params["goal_z_param"] = self.drone.pos.z
 
         # near to goal parameters
-        #if self._compute_goal_distance(xy=True) < 30: #not implemented yet self._stucked():
-        #    params["goal_z_param"] = self._true_goal_z
+        if self._compute_goal_distance(xy=True) < 60 or \
+                self._class_share(im,0.6)[self._labelID("sky")] > 0.8:
+            params["goal_z_param"] = self._true_goal_z
         print(f"transfer params {params}")
 
         return params
-
+    def tune_goalz(self,climb_angle):
+        distance = self._compute_goal_distance(xy=True)
+        return self.drone.pos.z + distance * math.tan(climb_angle / 180 * math.pi)
     def _compute_goal_distance(self,xy=False):
         goal_pose = self.goal.pos.pos_asarray
         drone_pose = self.drone.pos.pos_asarray
