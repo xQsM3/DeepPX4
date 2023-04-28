@@ -19,30 +19,38 @@ from utils import visualize,cv_utils,math_utils,kin_utils,geometry_utils
 from libs import inf_config
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TwistStamped
+from std_msgs.msg import String
 from visualization_msgs.msg import MarkerArray
 from utils.ros_com import im_array2im_msg,publish_xypath,DroneStateListener,GoalListener,ImageListener
-
+from utils.camera_utils import Camera
 class Px4Tuner():
     '''
     handles the parameter tuning of px4
     looks up best parameters for current segmentation state,
     and requests ros service to adjust parameters
     '''
-    def __init__(self,model_config,labels,dynreconfigure_name,goal_z):
+    def __init__(self,model_config,labels,dynreconfigure_name,goal,color_map):
         rospy.init_node("px4_parameter_tuner")
         self._LUT = self._load_table()
+        self.color_map = color_map
         self._cls_num, self._clss = self._get_clss(model_config)
         self.change_params = dynamic_reconfigure.client.Client(dynreconfigure_name)
         self._labels = self._load_labels(labels)
 
         self.drone = DroneStateListener(pose_topic="/mavros/global_position/local", pose_type=Odometry,
                                         vel_topic="/mavros/local_position/velocity_local",vel_type=TwistStamped)
-        self.goal = GoalListener(goal_topic="/goal_position", type=MarkerArray)
-
+        self.goalpos = goal
+        self.init_goal_z(goal)
+        self.camera = Camera(info_topic="/camera_front/rgb/camera_info",
+                             image_topic="/segmentation_image")
+        self.debug_pub = rospy.Publisher("/debug",String,queue_size=10)
         self.path = math_utils.Polyline([(self.drone.pos.x,self.drone.pos.y,
                                           self.drone.pos.z,rospy.get_time())]) # drone path
-        self._fixing_stucked = 0
-        self._true_goal_z = goal_z
+
+    def init_goal_z(self,goal):
+        #gives initial goal z parameter to dyn reconfigure
+        params = {"goal_z_param":goal.z}
+        self.change_params.update_configuration(params)
     def request_parameter_change(self,im):
         params = self._analyze_state(im)
         try:
@@ -53,66 +61,86 @@ class Px4Tuner():
     def _ascending(self):
         return True if abs(self.drone.vel_linear.z) >= 0.06 else False
     def _analyze_state(self,im):
-        self._update_path()
         print("PARAMETER TUNING")
-        print(f"above 50% skyvision in %: {self._class_share(im,0.5)[self._labelID('sky')]}")
-        print(f"above 10% skyvision in %: {self._class_share(im,0.1)[self._labelID('sky')]}")
+
+        roi,goal_proj = self.determine_roi(widthp=0.3,heightp=0.1)
+        print(f"above 20% skyvision in %: {self._class_share(self._crop(im,roi))[self._labelID('sky')]}")
+        if roi:
+            self.camera.publish_roi_segmentation(roi,goal_proj,visualize.addcolor(im,self.color_map))
+
         # analyze segmentation state and suggest px4 parameters
-        if self._class_share(im,0.2)[self._labelID("sky")] < 0.8:
+        if self._class_share(self._crop(im,roi))[self._labelID("sky")] < 0.4:
+            # parameter study inspired params
             params = self._lookup(3)
-            #if self._stucked():
-            params["goal_z_param"] = self.tune_goalz(climb_angle=18)
+            # bio inspired params
+            params["goal_z_param"] = self.tune_goalz(climb_angle=20)  # max in config is 5000
         else:
             params = self._lookup(0)
-            params["goal_z_param"] = self.drone.pos.z
+            params["goal_z_param"] = self.drone.pos.z #hold altitude
 
-        # near to goal parameters
-        if self._compute_goal_distance(xy=True) < 60 or \
-                self._class_share(im,0.6)[self._labelID("sky")] > 0.8:
-            params["goal_z_param"] = self._true_goal_z
-        print(f"transfer params {params}")
+        # reset goal z near to goal, or if sky is free
+        roi_descending = roi
+        roi_descending.h = roi.h * 6
+        if self._compute_goal_distance(xy=True) < 15 or \
+                self._class_share(self._crop(im,roi_descending))[self._labelID("sky")] > 0.8 or \
+                not self.goal_projection_is_obstacle(goal_proj=goal_proj,image=im):
+            params["goal_z_param"] = self.goalpos.z
 
+        self.debug_pub.publish(f"xy_goal_distance: {self._compute_goal_distance()}"
+                               f"projected goal {goal_proj.x,goal_proj.y}"
+                               f"goal sky/road class: {not self.goal_projection_is_obstacle(goal_proj=goal_proj,image=im)}")
         return params
+
+    def goal_projection_is_obstacle(self,goal_proj,image):
+        # returns false if goal projection point belongs to sky
+        # note this is primitive, does not check if goal is in front of a building..
+        if not goal_proj.x or not goal_proj.y:
+            return True
+        if image[int(goal_proj.y), int(goal_proj.x)][0] == self._labelID("sky"):
+            return False
+        if image[int(goal_proj.y), int(goal_proj.x)][0] == self._labelID("road"):
+            return False
+        return True
+
+    def determine_roi(self,widthp=0.3,heightp=0.2):
+        # project goal on image
+        goalpos = np.array([self.goalpos.x,self.goalpos.y,self.goalpos.z]).reshape(3,1)
+        goal_projection = self.camera.project_worldpoint_2_cameraplane(goalpos)
+
+        # take whole image width as roi if goal is not visible / projectable
+        if not goal_projection.x or not goal_projection.y:
+            roi = math_utils.Box(x=0,
+                                 y=0,
+                                 w=self.camera.width,
+                                 h=int(self.camera.height*heightp))
+            return roi,goal_projection
+
+        # otherwise, create roi around goal x coordinate
+        roi = math_utils.Box(x = int(goal_projection.x - self.camera.width * widthp / 2),
+                             y = 0, #y = int(goal_projection.y - self.camera.height * heightp / 2),
+                             w = int(self.camera.width * widthp),
+                             h = int(self.camera.width * heightp))
+        return roi,goal_projection
+
     def tune_goalz(self,climb_angle):
         distance = self._compute_goal_distance(xy=True)
         return self.drone.pos.z + distance * math.tan(climb_angle / 180 * math.pi)
     def _compute_goal_distance(self,xy=False):
-        goal_pose = self.goal.pos.pos_asarray
+        goal_pose = self.goalpos.pos_asarray
         drone_pose = self.drone.pos.pos_asarray
         if xy: #compute distance in xy plane
             goal_pose[2],drone_pose[2] = 0,0
         return np.linalg.norm(goal_pose-drone_pose)
 
-    def _compute_goal_angle_arroundaxis(self,axis="z"):
-        assert (axis=="x" or axis=="y" or axis=="z" ), "axis musst be x,y or z as string"
-        goal_pose = self.goal.pos.pos_asarray
-        drone_pose = self.drone.pos.pos_asarray
-        goal_vector = goal_pose-drone_pose
-        if axis=="x":
-            axis_vector = np.array([1, 0, 0])
-        elif axis=="y":
-            axis_vector = np.array([0,1,0])
-        else:
-            axis_vector = np.array([0,0,1])
-        a = geometry_utils.angle_between(goal_vector,axis_vector)
-        return a
     def _get_clss(self, model_config_path):
         model_config = inf_config.ConfigArgs(model_config_path)
         cls_num = len(model_config.custom_color) //3
         return cls_num,[i for i in range(0,cls_num)]
 
-    def _class_share(self,im,p):
-        strip = self._strip(im,p)
-        n = strip.size
-        distribution = [np.count_nonzero(strip==c) / n for c in self._clss]
+    def _class_share(self,im):
+        n = im.size
+        distribution = [np.count_nonzero(im==c) / n for c in self._clss]
         return distribution
-    def _head_toe_goal(self,angle_thresh):
-        a_border1 = angle_thresh * math.pi / 180
-        a_border2 = math.pi - a_border1
-        angle = self._compute_goal_angle_arroundaxis(axis="z")
-        if angle < a_border1 or angle > a_border2:
-            return True
-        return False
 
     def _labelID(self,cls_name):
         # returns train id of specific class
@@ -132,6 +160,10 @@ class Px4Tuner():
         params = dict(zip(self._LUT.loc[i].index,self._LUT.loc[i]))
         return params
 
+    def _crop(self,im,roi):
+        crop = im[roi.y:roi.y+roi.h,roi.x:roi.x+roi.w]
+        return crop
+
     def _strip(self,im,p):
         # crops upper strip of image in percent (p)
         height = im.shape[0]
@@ -139,24 +171,6 @@ class Px4Tuner():
         strip = im[0:height_strip,:]
         return strip
 
-    def _stucked(self,approach_limit=10,intersec_limit=1,fixfor=5):
-        # get intersections
-        intersections = self.path.SelfIntersections() # determine intersections
-        intersections = math_utils.postprocess_intersections(intersections, timethresh=15, z_thresh=100)
-        publish_xypath(self.path, intersections,
-                       [], self._fixing_stucked)
-        print(len(intersections) >= intersec_limit,self._hover())
-        if len(intersections) >= intersec_limit and not self._hover():
-            '''
-            self._fixing_stucked += 1
-            if self._fixing_stucked >= fixfor:
-                self._fixing_stucked = 0
-            self.path = math_utils.Polyline([(self.drone.pos.x, self.drone.pos.y,
-                                              self.drone.pos.z,
-                                              rospy.get_time())]) # reset drone path recording
-            '''
-            return True
-        return False
     def _update_path(self):
         self.path.Add(self.drone.pos.x,self.drone.pos.y,
                       self.drone.pos.z,rospy.get_time())
@@ -169,7 +183,10 @@ class Px4Tuner():
             return False
 def tuning_loop(image_topic, hz,model_config_path,scale,dynreconfigure_name,goal_z):
     seg_pub = rospy.Publisher("segmentation_image",Image,queue_size=10)
-    tune = Px4Tuner(model_config=model_config_path,labels=pargs.labels,dynreconfigure_name=dynreconfigure_name,goal_z=goal_z)
+    color_map = visualize.get_color_map(model_config_path)
+    tune = Px4Tuner(model_config=model_config_path,labels=pargs.labels,
+                    dynreconfigure_name=dynreconfigure_name,goal=goal,
+                    color_map=color_map)
     rate = rospy.Rate(hz)
     color_map = visualize.get_color_map(model_config_path)
     im_listener = ImageListener(image_topic)
@@ -229,8 +246,9 @@ if __name__ == "__main__":
         default="local_planner_nodelet",
         type=str)
     parser.add_argument(
-        '--goal_z',
-        type=float)
+        '--goal',
+        type=str,
+        required=True)
 
 
 
@@ -250,4 +268,8 @@ if __name__ == "__main__":
     launch.start()
     process = launch.launch(node)
 
-    tuning_loop(pargs.image_topic, pargs.hz, pargs.config,pargs.scale,pargs.dynreconfigure_name,pargs.goal_z)
+    goal_list = pargs.goal.split(" ")
+    goal = kin_utils.Pose(x=float(goal_list[0]),
+                               y=float(goal_list[1]),
+                               z=float(goal_list[2]))
+    tuning_loop(pargs.image_topic, pargs.hz, pargs.config,pargs.scale,pargs.dynreconfigure_name,goal)

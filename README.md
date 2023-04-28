@@ -98,7 +98,7 @@ conda activate paddleseg_cpu # if working with virtual environment
 catkin_make  
 source devel/setup.bash  
 cd ~/DeepPX4/src/parameter_tuning/scripts/  
-python parameter_tuner.py  
+python parameter_tuner.py --goal="0 400 5"  
 
   
 # DEBUG WITH PYCHARM  

@@ -97,3 +97,14 @@ def postprocess_intersections(intersects,timethresh,z_thresh):
 
     return intersects
 
+class Point2D:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+
+class Box:
+    def __init__(self,x,y,w,h):
+        self.x = x #top left
+        self.y = y # top left
+        self.w = w
+        self.h = h
