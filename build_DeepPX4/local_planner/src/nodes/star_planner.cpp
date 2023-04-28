@@ -80,6 +80,7 @@ void StarPlanner::buildLookAheadTree() {
       int children = 0;
       for (candidateDirection candidate : candidate_vector) {
         PolarPoint candidate_polar = candidate.toPolar(tree_node_distance_);
+        // std::cout << "candidate elevation " << candidate_polar.e << std::endl;
         Eigen::Vector3f node_location = polarHistogramToCartesian(candidate_polar, origin_position);
         Eigen::Vector3f node_velocity = node_location - origin_position;  // todo: simulate!
 

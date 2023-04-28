@@ -74,7 +74,7 @@ do
 	#start simulation
 	echo "start local_planner"
 
-	xterm -hold -e "roslaunch local_planner $launchfile >> '$save_path/tlog/ros/$name1.txt' 2>&1" &
+	xterm -hold -e "roslaunch local_planner $launchfile" & # >> '$save_path/tlog/ros/$name1.txt' 2>&1
 	ros_pid="$!" # store process pid for later killing    
 	sleep 10
 	if    ### checking for errors at the beginning ###
@@ -185,7 +185,7 @@ do
 			elif (( $(echo "$j1 < $j2" | bc -l) ));then			#x
 				amount_positiv_y_heading=$(echo "($amount_positiv_y_heading+1)" | bc);					
 			fi
-
+: '
 			if [ $amount_positiv_y_heading -ge $definiton_turn ] && [ $amount_negativ_y_heading -ge $definiton_turn ] ;then  #(x)
 				turnover=$(echo "($turnover+1)" | bc);
 				if [ $turnover == 1 ] ;then		#x	
@@ -200,7 +200,7 @@ do
 				amount_positiv_y_heading=0;
 				amount_negativ_y_heading=0;					
 			fi
-
+'
 		fi		
 	done
 #	if [ "$SECONDS" -gt "$TIME_LIMIT" ]; then 

@@ -359,6 +359,7 @@ void LocalPlannerNodelet::calculateWaypoints(bool hover) {
                              desired_velocity_);
   waypointResult result = wp_generator_->getWaypoints();
 
+  // std::cout << "waypoint type " << toString(result.waypoint_type) << std::endl;
   Eigen::Vector3f closest_pt = Eigen::Vector3f(NAN, NAN, NAN);
   Eigen::Vector3f deg60_pt = Eigen::Vector3f(NAN, NAN, NAN);
   wp_generator_->getOfftrackPointsForVisualization(closest_pt, deg60_pt);

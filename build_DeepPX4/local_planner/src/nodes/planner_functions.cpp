@@ -333,6 +333,9 @@ std::pair<float, float> costFunction(const PolarPoint& candidate_polar, float ob
   // Compute  polar direction to goal and cartesian representation of current direction to evaluate
   const PolarPoint facing_goal = cartesianToPolarHistogram(goal, position);
   const float goal_distance = (goal - position).norm();
+  // DeepPX4b
+  float goal_distance_xy = std::sqrt( std::pow((goal.x()-position.x()),2.0f) +  std::pow( (goal.y()-position.y()),2.0f) );
+
   const Eigen::Vector3f candidate_velocity_cartesian =
       polarHistogramToCartesian(candidate_polar, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
 
@@ -356,13 +359,14 @@ std::pair<float, float> costFunction(const PolarPoint& candidate_polar, float ob
   // DeepPX4b
   // std::cout << "fov pitch deg " << fov_pitch_deg << std::endl;
   // std::cout << "candidate elevation " << candidate_polar.e << std::endl;
-
-  if (candidate_polar.e > fov_pitch_deg/2 || candidate_polar.e < - fov_pitch_deg/2 ) {
+  // std::cout << "goal distance xy " << goal_distance_xy << std::endl
+  if ((candidate_polar.e > fov_pitch_deg/2.2 || candidate_polar.e < - fov_pitch_deg/2) && goal_distance_xy > 10.f ) {
       pitch_cost = std::numeric_limits<float>::max(); //assign infinite cost for candidates out of elevation sensor range
   }
   // std::cout << "pitch cost" << pitch_cost << std::endl;
 
   // increase the pitch cost starting at 5m from the goal (forcing the drone to goal altitude)
+  //DeepPX4b change goal_distance to goal_distace_xy
   if (goal_distance < 5.f) {
       pitch_cost = pitch_cost / ((0.2 * goal_distance) * (0.2 * goal_distance));
   }

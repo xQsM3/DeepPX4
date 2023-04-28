@@ -63,13 +63,13 @@ class Px4Tuner():
     def _analyze_state(self,im):
         print("PARAMETER TUNING")
 
-        roi,goal_proj = self.determine_roi(widthp=0.3,heightp=0.1)
+        roi,goal_proj = self.determine_roi(widthp=0.3,heightp=0.3)
         print(f"above 20% skyvision in %: {self._class_share(self._crop(im,roi))[self._labelID('sky')]}")
         if roi:
             self.camera.publish_roi_segmentation(roi,goal_proj,visualize.addcolor(im,self.color_map))
 
         # analyze segmentation state and suggest px4 parameters
-        if self._class_share(self._crop(im,roi))[self._labelID("sky")] < 0.4:
+        if self._class_share(self._crop(im,roi))[self._labelID("sky")] < 0.8:
             # parameter study inspired params
             params = self._lookup(3)
             # bio inspired params
@@ -80,7 +80,7 @@ class Px4Tuner():
 
         # reset goal z near to goal, or if sky is free
         roi_descending = roi
-        roi_descending.h = roi.h * 6
+        roi_descending.h = roi.h * 2
         if self._compute_goal_distance(xy=True) < 15 or \
                 self._class_share(self._crop(im,roi_descending))[self._labelID("sky")] > 0.8 or \
                 not self.goal_projection_is_obstacle(goal_proj=goal_proj,image=im):
