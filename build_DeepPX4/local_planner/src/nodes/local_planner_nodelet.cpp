@@ -655,8 +655,8 @@ void LocalPlannerNodelet::communication_controller(std::string para_name, float 
 
 void LocalPlannerNodelet::set_yaw_pitch(std::string strategy) const {
   //Parameters
-  float yaw_low = 3;
-  float yaw_norm = 7 ;
+  float yaw_low = 2;
+  float yaw_norm = 3 ;
   float yaw_high = 15;
   float pitch_low = 5;
   float pitch_norm = 15;

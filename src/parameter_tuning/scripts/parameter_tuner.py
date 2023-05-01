@@ -69,7 +69,7 @@ class Px4Tuner():
             self.camera.publish_roi_segmentation(roi,goal_proj,visualize.addcolor(im,self.color_map))
 
         # analyze segmentation state and suggest px4 parameters
-        if self._class_share(self._crop(im,roi))[self._labelID("sky")] < 0.8:
+        if self._class_share(self._crop(im,roi))[self._labelID("sky")] < 0.6:
             # parameter study inspired params
             params = self._lookup(3)
             # bio inspired params
@@ -89,6 +89,10 @@ class Px4Tuner():
         self.debug_pub.publish(f"xy_goal_distance: {self._compute_goal_distance()}"
                                f"projected goal {goal_proj.x,goal_proj.y}"
                                f"goal sky/road class: {not self.goal_projection_is_obstacle(goal_proj=goal_proj,image=im)}")
+
+
+        if self._class_share(self._crop(im,roi_descending))[self._labelID("tree")] > 0.1:
+            params["obstacle_cost_param_"] = 15
         return params
 
     def goal_projection_is_obstacle(self,goal_proj,image):
