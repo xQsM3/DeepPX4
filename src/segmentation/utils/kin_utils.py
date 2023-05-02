@@ -30,3 +30,8 @@ class Pose:
 class Velocity(Pose):
     def __init__(self,x,y,z):
         super().__init__(x,y,z)
+
+    @property
+    def asarray(self):
+        return np.array([self._x, self._y, self._z])
+

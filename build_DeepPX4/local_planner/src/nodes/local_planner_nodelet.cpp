@@ -655,13 +655,14 @@ void LocalPlannerNodelet::communication_controller(std::string para_name, float 
 
 void LocalPlannerNodelet::set_yaw_pitch(std::string strategy) const {
   //Parameters
-  float yaw_low = 2;
-  float yaw_norm = 3 ;
+  float yaw_low = 3;
+  float yaw_norm = 7 ;
   float yaw_high = 15;
   float pitch_low = 5;
   float pitch_norm = 15;
   float pitch_high = 25;
-
+   /*
+  this is done now by parameter tuner
   if (strategy == "normal") {
   //normal Yaw/Pitch ratio
     LocalPlannerNodelet::communication_controller("yaw_cost_param_", yaw_norm);
@@ -677,6 +678,7 @@ void LocalPlannerNodelet::set_yaw_pitch(std::string strategy) const {
     LocalPlannerNodelet::communication_controller("yaw_cost_param_", yaw_high);
     LocalPlannerNodelet::communication_controller("pitch_cost_param_", pitch_low);
   }
+  */
 }
 }
 #include <pluginlib/class_list_macros.h>

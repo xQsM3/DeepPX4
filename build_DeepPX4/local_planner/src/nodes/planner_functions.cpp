@@ -363,10 +363,10 @@ std::pair<float, float> costFunction(const PolarPoint& candidate_polar, float ob
   if ((candidate_polar.e > fov_pitch_deg/2.2 || candidate_polar.e < - fov_pitch_deg/2) && goal_distance_xy > 10.f ) {
       pitch_cost = std::numeric_limits<float>::max(); //assign infinite cost for candidates out of elevation sensor range
   }
+
   // std::cout << "pitch cost" << pitch_cost << std::endl;
 
   // increase the pitch cost starting at 5m from the goal (forcing the drone to goal altitude)
-  //DeepPX4b change goal_distance to goal_distace_xy
   if (goal_distance < 5.f) {
       pitch_cost = pitch_cost / ((0.2 * goal_distance) * (0.2 * goal_distance));
   }

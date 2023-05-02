@@ -28,6 +28,8 @@ class DroneStateListener:
 
         rospy.Subscriber(vel_topic,vel_type,self.vel_callback) #from nav_msgs.msg import Odometry
         self.vel_msg = rospy.wait_for_message(vel_topic,vel_type,timeout=20)
+
+        self.stucked = 0
         #"/mavros/local_position/velocity_local"
     @property
     def pos(self):
@@ -44,11 +46,18 @@ class DroneStateListener:
         z = self.vel_msg.twist.linear.z
         vel = kin_utils.Velocity(x, y, z)
         return vel
-
+    def vel_total(self):
+        return np.linalg.norm(self.vel_linear.asarray)
     def pose_callback(self,msg):
         self.pose_msg = msg
     def vel_callback(self,msg):
         self.vel_msg = msg
+    def is_hovering(self):
+        # returns true if drones velocity in x / y /z is almost 0
+        if abs(self.vel_total()) < 0.1:
+            return True
+        else:
+            return False
 
 class GoalListener:
     def __init__(self,goal_topic,type):

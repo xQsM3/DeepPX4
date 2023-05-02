@@ -82,17 +82,26 @@ class Px4Tuner():
         roi_descending = roi
         roi_descending.h = roi.h * 2
         if self._compute_goal_distance(xy=True) < 15 or \
-                self._class_share(self._crop(im,roi_descending))[self._labelID("sky")] > 0.8 or \
                 not self.goal_projection_is_obstacle(goal_proj=goal_proj,image=im):
             params["goal_z_param"] = self.goalpos.z
+
+        if self._compute_goal_distance(xy=True) < 0.5 and self.drone.is_hovering():
+            params["smoothing_speed_xy_"] = 0.3
+            params["smoothing_speed_z_"] = 0.1
+
+            self.drone.stucked += 1
+            if self.drone.stucked:
+                self.drone.stucked = 0
+                params["goal_z_param"] = self.drone.z +10
+
 
         self.debug_pub.publish(f"xy_goal_distance: {self._compute_goal_distance()}"
                                f"projected goal {goal_proj.x,goal_proj.y}"
                                f"goal sky/road class: {not self.goal_projection_is_obstacle(goal_proj=goal_proj,image=im)}")
 
 
-        if self._class_share(self._crop(im,roi_descending))[self._labelID("tree")] > 0.1:
-            params["obstacle_cost_param_"] = 15
+        #if self._class_share(self._crop(im,roi_descending))[self._labelID("tree")] > 0.1:
+        #    params["obstacle_cost_param_"] = 15
         return params
 
     def goal_projection_is_obstacle(self,goal_proj,image):
@@ -178,13 +187,7 @@ class Px4Tuner():
     def _update_path(self):
         self.path.Add(self.drone.pos.x,self.drone.pos.y,
                       self.drone.pos.z,rospy.get_time())
-    def _hover(self):
-        # returns true if drones velocity in x / y is almost 0
-        if abs(self.drone.vel_linear.x) <= 0.05 or \
-                abs(self.drone.vel_linear.y <= 0.05):
-            return True
-        else:
-            return False
+
 def tuning_loop(image_topic, hz,model_config_path,scale,dynreconfigure_name,goal_z):
     seg_pub = rospy.Publisher("segmentation_image",Image,queue_size=10)
     color_map = visualize.get_color_map(model_config_path)
