@@ -40,16 +40,10 @@ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd):$(pwd)/Tools/sitl_gazebo
   
 roslaunch px4 multi_uav_mavros_sitl.launch  
 
-## install px4 avoidance
-cd ~/catkin_ws/src  
-  
-follow  install instructions  
-https://github.com/PX4/PX4-Avoidance  
-
 ## install anaconda
 https://docs.anaconda.com/anaconda/install/  
 
-## install DeepPX4
+## clone and install DeepPX4 and avoidance
 cd  
 git clone https://github.com/xQsM3/DeepPX4.git  
 cd ~/DeepPX4/build_DeepPX4  
@@ -60,18 +54,20 @@ https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.6/docs/install.md
   
 bash build.sh [catkin_ws] [gazebo] [px4] [env]  
 e.g.:  
-bash build.sh ~/catkin_ws ~/.gazebo ~/Firmware paddleseg_cpu  #change FIrmware path to your path
+bash build.sh ~/DeepPX4 ~/.gazebo ~/Firmware paddleseg_cpu  #change FIrmware path to your path
 
 
 cd ~/DeepPX4  
 catkin_make  
 source devel/setup.bash  
+##
+we provide a .bashrc in ~/DeepPX4/build_DeepPX4. although its a bit messy, you might have a look and copy paste the lines you need to set ROS paths
 
 # USAGE
 ## start multiple worlds
-cd ~/catkin_ws  
-catkin build -w ~/catkin_ws # if not build yet  
-source ~/catkin_ws/devel/setup.bash  
+cd ~/DeepPX4
+catkin_make
+source devel/setup.bash 
 cd ~/Firmware  # change this if you install firmware somewhere else
 source Tools/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default  
 export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd):$(pwd)/Tools/sitl_gazebo   
@@ -82,24 +78,47 @@ check if there is a "segterminal" tab launching the segmentation (after drone ta
 there might be a python package missing. follow instructions in "start single world" and check for
 errors in terminal 2)
   
-## start single world  
-1) terminal  
-cd ~/catkin_ws  
-catkin build -w ~/catkin_ws # if not build yet  
-source ~/catkin_ws/devel/setup.bash  
-cd ~/Firmware  # change this if you install firmware somewhere else
-source Tools/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default  
-export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd):$(pwd)/Tools/sitl_gazebo  
-roslaunch local_planner HANNASSCAPES_city_obst_1.launch #run a world    
-rosrun mavros mavsys mode -c OFFBOARD; rosrun mavros mavsafety arm
-2) terminal  
+## start single test world  
+1) terminal  (start gazebo world)  
 cd ~/DeepPX4  
-conda activate paddleseg_cpu # if working with virtual environment  
 catkin_make  
 source devel/setup.bash  
-cd ~/DeepPX4/src/parameter_tuning/scripts/  
-python parameter_tuner.py --goal="0 400 5"  
+cd ~/Firmware  # change this if you install firmware somewhere else  
+source Tools/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default  
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd):$(pwd)/Tools/sitl_gazebo   
+cd ~/DeepPX4  
+conda activate paddleseg_cpu # if working with virtual environment  
+roslaunch local_planner test.launch  
+2) terminal  
+rosrun mavros mavsys mode -c OFFBOARD; rosrun mavros mavsafety arm  
 
+## start single HANNASSCAPES world
+as these launch files are from older versions, they must be started differently to the test.launch file:  
+1) terminal  (start gazebo world)  
+cd ~/DeepPX4  
+catkin_make  
+source devel/setup.bash   
+cd ~/Firmware  # change this if you install firmware somewhere else  
+source Tools/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default  
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd):$(pwd)/Tools/sitl_gazebo   
+cd ~/DeepPX4  
+conda activate paddleseg_cpu # if working with virtual environment
+roslaunch local_planner HANNASSCAPES_city_obst_1.launch
+2) terminal (start AI)  
+cd ~/DeepPX4  
+catkin_make  
+source devel/setup.bash   
+cd ~/Firmware  # change this if you install firmware somewhere else  
+source Tools/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default  
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd):$(pwd)/Tools/sitl_gazebo   
+cd ~/DeepPX4  
+conda activate paddleseg_cpu # if working with virtual environment  
+roslaunch parameter_tuning cored_tuner.launch  
+3) terminal (change mode)  
+rosrun mavros mavsys mode -c OFFBOARD; rosrun mavros mavsafety arm  
+
+##create own launch files
+ATTENTION: use the test.launch as a template for custom launch files. do NOT use the HANNASSCAPES/*.launch as templates, as these are build up from an older version and are less convenient
   
 # DEBUG WITH PYCHARM  
 https://www.youtube.com/watch?v=lTew9mbXrAs&t=288s  

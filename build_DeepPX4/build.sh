@@ -32,10 +32,10 @@ if [ ! -d "$catkin_ws/src/avoidance" ]; then
 	echo "avoidance not found, did you install avoidace and local_planner as instructed?"
 	exit 125
 fi
-cp -r local_planner "$catkin_ws/src/avoidance/local_planner"
-cp -r launch/HANNASSCAPES "$catkin_ws/src/avoidance/local_planner/launch"
-cp -r worlds/HANNASSCAPES "$catkin_ws/src/avoidance/avoidance/sim/worlds"
-cp -r LocalPlannerNode.cfg "$catkin_ws/src/avoidance/local_planner/cfg"
+#cp -r local_planner "$catkin_ws/src/avoidance/local_planner"
+#cp -r launch/HANNASSCAPES "$catkin_ws/src/avoidance/local_planner/launch"
+#cp -r worlds/HANNASSCAPES "$catkin_ws/src/avoidance/avoidance/sim/worlds"
+#cp -r LocalPlannerNode.cfg "$catkin_ws/src/avoidance/local_planner/cfg"
 
 echo "catkin make DeepPX4"
 cd ~/DeepPX4  

@@ -52,19 +52,20 @@ class Px4Tuner():
         params = {"goal_z_param":goal.z}
         self.change_params.update_configuration(params)
     def request_parameter_change(self,im):
-        params = self._analyze_state(im)
         try:
+            params = self._analyze_state(im)
             config = self.change_params.update_configuration(params)
             print(f"ParamSet successfull: {config}")
         except rospy.ServiceException as e:
-            print("failed ParamSet")
+            print(f"failed ParamSet with error:\n{e}")
+
     def _ascending(self):
         return True if abs(self.drone.vel_linear.z) >= 0.06 else False
     def _analyze_state(self,im):
         print("PARAMETER TUNING")
 
         roi,goal_proj = self.determine_roi(widthp=0.3,heightp=0.3)
-        print(f"above 20% skyvision in %: {self._class_share(self._crop(im,roi))[self._labelID('sky')]}")
+        #print(f"above 20% skyvision in %: {self._class_share(self._crop(im,roi))[self._labelID('sky')]}")
         if roi:
             self.camera.publish_roi_segmentation(roi,goal_proj,visualize.addcolor(im,self.color_map))
 
@@ -79,29 +80,27 @@ class Px4Tuner():
             params["goal_z_param"] = self.drone.pos.z #hold altitude
 
         # reset goal z near to goal, or if sky is free
-        roi_descending = roi
-        roi_descending.h = roi.h * 2
         if self._compute_goal_distance(xy=True) < 15 or \
                 not self.goal_projection_is_obstacle(goal_proj=goal_proj,image=im):
             params["goal_z_param"] = self.goalpos.z
-
+        # force goal approach near goal
+        if self._compute_goal_distance(xy=True) < 5:
+            params["pitch_cost_param_"] = 25
+            params["yaw_cost_param_"] = 20
+        # reduce smoothing if very near to goal
         if self._compute_goal_distance(xy=True) < 0.5 and self.drone.is_hovering():
             params["smoothing_speed_xy_"] = 0.3
             params["smoothing_speed_z_"] = 0.1
-
-            self.drone.stucked += 1
-            if self.drone.stucked:
-                self.drone.stucked = 0
-                params["goal_z_param"] = self.drone.z +10
+            #self.drone.stucked += 1
+            #if self.drone.stucked:
+            #    self.drone.stucked = 0
+            #    params["goal_z_param"] = self.drone.pos.z +10
 
 
         self.debug_pub.publish(f"xy_goal_distance: {self._compute_goal_distance()}"
                                f"projected goal {goal_proj.x,goal_proj.y}"
                                f"goal sky/road class: {not self.goal_projection_is_obstacle(goal_proj=goal_proj,image=im)}")
 
-
-        #if self._class_share(self._crop(im,roi_descending))[self._labelID("tree")] > 0.1:
-        #    params["obstacle_cost_param_"] = 15
         return params
 
     def goal_projection_is_obstacle(self,goal_proj,image):
@@ -188,7 +187,7 @@ class Px4Tuner():
         self.path.Add(self.drone.pos.x,self.drone.pos.y,
                       self.drone.pos.z,rospy.get_time())
 
-def tuning_loop(image_topic, hz,model_config_path,scale,dynreconfigure_name,goal_z):
+def tuning_loop(image_topic, hz,model_config_path,scale,dynreconfigure_name,goal):
     seg_pub = rospy.Publisher("segmentation_image",Image,queue_size=10)
     color_map = visualize.get_color_map(model_config_path)
     tune = Px4Tuner(model_config=model_config_path,labels=pargs.labels,
@@ -209,64 +208,33 @@ def tuning_loop(image_topic, hz,model_config_path,scale,dynreconfigure_name,goal
 
         rate.sleep()
 
-def read_rosparams(args):
-    try:
-        args.dynreconfigure_name = rospy.get_param("px4_parameter_tuner/dynreconfigure_name")
-    except:
-        pass
+def read_rosparams():
+    class Args:
+        def __init__(self):
+            self.dynreconfigure_name = rospy.get_param("px4_parameter_tuner/dynreconfigure_name")
+            self.image_topic = rospy.get_param("px4_parameter_tuner/image_topic")
+            self.hz = rospy.get_param("px4_parameter_tuner/hz")
+            self.scale = rospy.get_param("px4_parameter_tuner/scale")
+            self.config = rospy.get_param("px4_parameter_tuner/config")
+            self.labels = rospy.get_param("px4_parameter_tuner/labels")
+            self.device = rospy.get_param("px4_parameter_tuner/device")
+            '''
+            goal_list = rospy.get_param("px4_parameter_tuner/goal").split(" ")
+            self.goal = kin_utils.Pose(x=float(goal_list[0]),
+                                       y=float(goal_list[1]),
+                                       z=float(goal_list[2]))
+            '''
+            self.goal = kin_utils.Pose(x=float(rospy.get_param("local_planner_nodelet/goal_x_param")),
+                                       y=float(rospy.get_param("local_planner_nodelet/goal_y_param")),
+                                       z=float(rospy.get_param("local_planner_nodelet/goal_z_param")))
+
+
+    args = Args()
     return args
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument(
-        '--image_topic',
-        help='image topic of ros',
-        default='/camera_front/rgb/image_raw',
-        type=str)
-    parser.add_argument(
-        '--hz',
-        help='refreshing rate',
-        default='10',
-        type=int)
-    parser.add_argument(
-        '--scale',
-        help='scale of segmentation model input image, 1 and 0.5 tested ',
-        default='1.',
-        type=float)
-    parser.add_argument(
-        '--config',
-        help='seg model config',
-        default='configs/ppliteseg_hannasscapes.yml',
-        type=str)
-    parser.add_argument(
-        '--labels',
-        help='seg model label path',
-        default='weights/ppliteseg_hannasscapes/labels.json',
-        type=str)
-    parser.add_argument(
-        '--device',
-        help='device for NN model either cpu or gpu',
-        default='cpu',
-        type=str)
-    parser.add_argument(
-        '--dynreconfigure_name',
-        help='name of dynamic reconfigure nodelet topic',
-        default="local_planner_nodelet",
-        type=str)
-    parser.add_argument(
-        '--goal',
-        type=str,
-        required=True)
+    pargs = read_rosparams()
 
-
-
-
-    try:
-        pargs = parser.parse_args()
-    except:
-        pargs, unknown = parser.parse_known_args()
-    pargs = read_rosparams(pargs) # read parameters from launch file, if tuner was started by roslaunch
-
-    # start segmentaiton node @todo: change this to launch file
+    '''
     package = 'segmentation'
     executable = 'seg_service.py'
     node_name = 'segmentation_server'
@@ -274,9 +242,7 @@ if __name__ == "__main__":
     launch = roslaunch.scriptapi.ROSLaunch()
     launch.start()
     process = launch.launch(node)
+    '''
 
-    goal_list = pargs.goal.split(" ")
-    goal = kin_utils.Pose(x=float(goal_list[0]),
-                               y=float(goal_list[1]),
-                               z=float(goal_list[2]))
-    tuning_loop(pargs.image_topic, pargs.hz, pargs.config,pargs.scale,pargs.dynreconfigure_name,goal)
+
+    tuning_loop(pargs.image_topic, pargs.hz, pargs.config,pargs.scale,pargs.dynreconfigure_name,pargs.goal)

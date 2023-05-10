@@ -36,7 +36,7 @@ then
 fi
 
 	
-	start=1;
+	start=12;
 	echo $launchname
 	if [[ $launchname == "simple_obst" ]]; then
 		end=900
@@ -75,14 +75,14 @@ fi
 			 do  
 				launchfile=("HANNASSCAPES_$launchname"_"$t".launch); 
 		 
-				if [ ! -f "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile" ]; then	### cheking if given launchfile exists/is in the correct directory ### 
+				if [ ! -f "$dir"/DeepPX4/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile" ]; then	### cheking if given launchfile exists/is in the correct directory ### 
 				    tput setaf 1; echo "Error:launchfile not found!" ;tput setaf 7; 
 				    echo "Enterd: $launchname "; 
 				    printf "Searched launchfile: %s\n" "$launchfile" 
 					exit 1  
 				fi 
 				 
-				t=$(echo "($t+1)" | bc) 
+				t=$(echo "($t+1)" | bc)
 		 		./px4_sim_script_all_worlds_nodelet_HANNASSCAPES $launchfile $device;
 				
 				#conda activate paddleseg_cpu
@@ -102,14 +102,49 @@ fi
 		 do  
 			launchfile=("HANNASSCAPES_$launchname"_"$t".launch); 
 	 		
-			if [ ! -f "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile" ]; then	### cheking if given launchfile exists/is in the correct directory ### 
+
+
+
+			if [ ! -f "$dir"/DeepPX4/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile" ]; then	### cheking if given launchfile exists/is in the correct directory ### 
 			    tput setaf 1; echo "Error:launchfile not found!" ;tput setaf 7; 
 			    echo "Enterd: $launchname "; 
 			    printf "Searched launchfile: %s\n" "$launchfile" 
 				exit 1  
 			fi 
-			 
-			t=$(echo "($t+1)" | bc) 
+			
+			
+			echo $t
+			# just start specific worlds (e.g. incase they had ros connection errors )
+	 		if [ $t != 15 ] && [ $t != 26 ] && [ $t != 31 ] && [ $t != 36 ] && \
+				[ $t != 39 ] && [ $t != 48 ] && [ $t != 50 ] && [ $t != 65 ] && \
+				[ $t != 90 ] && [ $t != 91 ] && [ $t != 99 ] && [ $t != 100 ] && \
+				[ $t != 144 ] && [ $t != 195 ] && [ $t != 198 ] && [ $t != 202 ] && \
+				[ $t != 203 ] && [ $t != 213 ] && [ $t != 218 ] && [ $t != 224 ] && \
+				[ $t != 225 ] && [ $t != 228 ] && [ $t != 234 ] && [ $t != 249 ] && \
+				[ $t != 251 ] && [ $t != 269 ] && [ $t != 275 ] && [ $t != 278 ] && \
+				[ $t != 294 ] && [ $t != 296 ] && [ $t != 300 ] && [ $t != 336 ] && \
+				[ $t != 344 ] && [ $t != 347 ] && [ $t != 364 ] && [ $t != 365 ] && \
+				[ $t != 371 ] && [ $t != 381 ] && [ $t != 395 ] && [ $t != 411 ] && \
+				[ $t != 441 ] && [ $t != 443 ] && [ $t != 479 ] && [ $t != 480 ] && \
+				[ $t != 538 ] && [ $t != 540 ] && [ $t != 541 ] && [ $t != 568 ] && \
+				[ $t != 570 ] && [ $t != 575 ] && [ $t != 577 ] && [ $t != 587 ] && \
+				[ $t != 601 ] && [ $t != 616 ] && [ $t != 633 ] && [ $t != 640 ] && \
+				[ $t != 648 ] && [ $t != 665 ] && [ $t != 666 ] && [ $t != 667 ] && \
+				[ $t != 674 ] && [ $t != 675 ] && [ $t != 718 ] && [ $t != 719 ] && \
+				[ $t != 733 ] && [ $t != 734 ] && [ $t != 735 ] && [ $t != 744 ] && \
+				[ $t != 750 ] && [ $t != 760 ] && [ $t != 783 ] && [ $t != 789 ] && \
+				[ $t != 797 ] && [ $t != 811 ] && [ $t != 849 ] && [ $t != 865 ] && \
+				[ $t != 869 ] && [ $t != 870 ] && [ $t != 871 ] && [ $t != 874 ] && \
+				[ $t != 889 ] && [ $t != 890 ] && [ $t != 890 ] && [ $t != 890 ] && \
+				[ $t != 890 ]
+
+			then
+				#t=$(echo "($t+1)" | bc)
+				#continue
+				echo " "
+			fi
+ 			
+			t=$(echo "($t+1)" | bc)
 	 		./px4_sim_script_all_worlds_nodelet_HANNASSCAPES $launchfile $device;
 			wait < <(jobs -p)
 			sleep 2

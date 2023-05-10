@@ -56,9 +56,9 @@ do
 	killall -w -q gzserver;		
 		 
 	#set goal variables
-	goal_x=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_x_param']/@value" "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
-	goal_y=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_y_param']/@value" "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
-	goal_z=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_z_param']/@value" "$dir"/catkin_ws/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
+	goal_x=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_x_param']/@value" "$dir"/DeepPX4/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
+	goal_y=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_y_param']/@value" "$dir"/DeepPX4/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
+	goal_z=$(xmlstarlet sel -t -v "/launch/node//param[@name='goal_z_param']/@value" "$dir"/DeepPX4/src/avoidance/local_planner/launch/HANNASSCAPES/"$launchfile"); 
 	goal=("$goal_x","$goal_y","$goal_z")
 	echo $goal_z
 
@@ -95,11 +95,12 @@ do
 		dynrec_pid="$!" # store process pid for later killing
 		sleep 5;
 		echo "parameter tuner terminal"
+
+
 		xterm -hold -e "cd ~/DeepPX4; catkin_make >> '$save_path/tlog/seg/$name1.txt' 2>&1;
 						source devel/setup.bash >> '$save_path/tlog/seg/$name1.txt' 2>&1;
 						source ~/anaconda3/etc/profile.d/conda.sh >> '$save_path/tlog/seg/$name1.txt' 2>&1; 							conda activate paddleseg_$device >> '$save_path/tlog/seg/$name1.txt' 2>&1;
-						cd ~/DeepPX4/src/parameter_tuning/scripts >> '$save_path/tlog/seg/$name1.txt' 2>&1; 
-						python parameter_tuner.py --goal='${goal_x} ${goal_y} ${goal_z}'>> '$save_path/tlog/seg/$name1.txt' 2>&1" &
+						roslaunch parameter_tuning cored_tuner.launch >> '$save_path/tlog/seg/$name1.txt' 2>&1" &
 		seg_pid="$!" # store pid for later killing
 		
 		sleep 3			

@@ -3,6 +3,8 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from utils import visualize,cv_utils,math_utils,kin_utils,geometry_utils
 import rospy
+import numpy as np
+
 def im_array2im_msg(im_array):
     if fix_melodic.CvBridgeMelodic().fix_needed():
         im_msg = fix_melodic.CvBridgeMelodic().cv2_to_imgmsg(im_array, encoding="bgr8")

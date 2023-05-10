@@ -1,1 +1,0 @@
-set(ORDERED_PATHS "/home/linux123/catkin_ws/devel/.private/avoidance/lib;/opt/ros/melodic/lib")
