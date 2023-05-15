@@ -368,7 +368,7 @@ std::pair<float, float> costFunction(const PolarPoint& candidate_polar, float ob
   const float d = cost_params.obstacle_cost_param - obstacle_distance;
   //DeepPX4 change -> crash safety
   float distance_cost = obstacle_distance > 0 ? 5000.0f * (1 + d / sqrt(1 + d * d)) : 0.0f;
-  if (obstacle_distance < 1.f && distance_cost >0) {
+  if (obstacle_distance < 2.f && distance_cost >0) {
       distance_cost = std::numeric_limits<float>::max(); //assign infinite cost for candidates to close to obstacles
   }
   
