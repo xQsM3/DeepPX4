@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+#
+#
+# Andreas extention to px4_sim_script_extention_automated
+# Luc Stiemer
+#
+# extension to 'px4_sim_script'
+# 
+#
+#Please set values/strings: 
+#launchname startvalue endvalue email; e.g.:
+: <<KOMMENTARIO
+./px4_sim_script_all_worlds city_obst
+KOMMENTARIO
+
+####### put this file and px4_sim_script in the main directory (/home/"your id") ############
+
+###		POSSIBLE ERROR		### 
+# when using script from GitKraken on Ubuntu either:  
+#	- use dos2unix to change file format to Unix 
+#	- copy-paste content to file created on Ubuntu directly rather than downloading it from GitKraken 
+
+echo "Skript started"
+
+device=${1?$(tput setaf 1)Error: give device type, cpu or gpu$(tput setaf 7)}
+
+
+echo e
+if [ $device != "cpu" ] && [ $device != "gpu" ];
+then
+  printf '%s\n' "ValueError: device must be either cpu or gpu, you typed $device" >&2  # write error message to stderr
+  exit 1                                  # or exit $test_result
+fi
+
+dir=$(eval echo ~$USER)
+launchfile="random.launch"
+worldlist="$dir"/DeepPX4/src/avoidance/local_planner/launch/HANNASSCAPES_random/worldlist.txt
+
+if [ ! -f "$dir"/DeepPX4/src/avoidance/local_planner/launch/HANNASSCAPES_random/"$launchfile" ]; then	### cheking if given launchfile exists/is in the correct directory ### 
+    tput setaf 1; echo "Error:launchfile not found!" ;tput setaf 7; 
+    echo "Enterd: $launchname "; 
+    printf "Searched launchfile: %s\n" "$launchfile" 
+	exit 1  
+fi 
+
+
+
+while read world
+do  
+	echo $launchfile	
+	./px4_sim_script_all_worlds_nodelet_HANNASSCAPES_random $launchfile $device $world;
+	wait < <(jobs -p)
+	sleep 2
+
+done < $worldlist

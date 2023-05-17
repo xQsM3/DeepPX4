@@ -1,0 +1,3598 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sdf version="1.6">
+
+   <world name="default">
+
+      <gui fullscreen="0">
+
+         <camera name="user_camera">
+
+            <pose>-15 0 4.57585 0 0 0</pose>
+
+            <view_controller>orbit</view_controller>
+
+         </camera>
+
+      </gui>
+
+      <scene>
+
+         <sky>
+
+           <clouds>
+
+             <speed>12</speed>
+
+           </clouds>
+
+         </sky>
+
+         <ambient>0.4 0.4 0.4 1</ambient>
+
+         <background>0.7 0.7 0.7 1</background>
+
+         <shadows>1</shadows>
+
+      </scene>
+
+      <gravity>0 0 -9.8066</gravity>
+
+      <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+
+      <physics default="0" name="default_physics" type="ode">
+
+         <ode>
+
+            <solver>
+
+               <type>quick</type>
+
+               <iters>10</iters>
+
+               <sor>1.0</sor>
+
+               <use_dynamic_moi_rescaling>0</use_dynamic_moi_rescaling>
+
+            </solver>
+
+            <constraints>
+
+               <cfm>0</cfm>
+
+               <erp>0.2</erp>
+
+               <contact_max_correcting_vel>100</contact_max_correcting_vel>
+
+               <contact_surface_layer>0.001</contact_surface_layer>
+
+            </constraints>
+
+         </ode>
+
+         <max_step_size>0.004</max_step_size>
+
+         <real_time_factor>1</real_time_factor>
+
+         <real_time_update_rate>250</real_time_update_rate>
+
+      </physics>
+
+      <light name="sun" type="directional">
+
+         <cast_shadows>1</cast_shadows>
+
+         <pose>0 0 10 0 0 0</pose>
+
+         <diffuse>0.8 0.8 0.8 1</diffuse>
+
+         <specular>0.2 0.2 0.2 1</specular>
+
+         <attenuation>
+
+            <range>1000</range>
+
+            <constant>0.9</constant>
+
+            <linear>0.01</linear>
+
+            <quadratic>0.001</quadratic>
+
+         </attenuation>
+
+         <direction>-0.5 0.1 -0.9</direction>
+
+      </light>
+
+      <include>
+
+         <name>ground_plane_1</name>
+
+         <uri>model://HANNAS_ground_plane</uri>
+
+         <pose>0 0 0  0 0 0</pose>
+
+      </include>
+
+      <include>
+
+         <name>ground_plane_2</name>
+
+         <uri>model://HANNAS_ground_plane</uri>
+
+         <pose>100 0 0  0 0 0</pose>
+
+      </include>
+      <model name="building_1">
+
+         <static>0</static>
+         <pose frame="">294.4453807189214 154.45991014234244 77.20308304561388 -1.1200591490920457 -1.020409278105367 1.8969526885437609</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 40.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>39 15 80</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>39 15 80</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_2">
+
+         <static>0</static>
+         <pose frame="">-11.401880124403998 -159.5863640138179 90.38461801216162 -0.15950293910349927 0.08600053872945164 1.4010527220961295</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 1.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>45 2 3</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>45 2 3</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_3">
+
+         <static>0</static>
+         <pose frame="">114.70099351908384 221.73372928154 142.72379098765032 1.4442625734164611 -0.9128960162092445 -1.5976103081515654</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 19.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 2 38</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 2 38</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_4">
+
+         <static>0</static>
+         <pose frame="">424.22635695065145 -21.48473176961246 20.51723785798915 1.260410373988103 1.2270869016360613 2.1542366521095477</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 1.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>18 18 2</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>18 18 2</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_5">
+
+         <static>0</static>
+         <pose frame="">171.9761827230846 113.14588795558419 42.15741549754327 -0.12134546416696623 -0.42938081543149353 -1.9652833209403975</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 16.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 17 32</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 17 32</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_6">
+
+         <static>0</static>
+         <pose frame="">40.86290942051367 -54.883704738137816 77.98028878233062 -2.805572382942198 1.4039997030807687 1.8447870137020055</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 38.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>50 15 76</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>50 15 76</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_7">
+
+         <static>0</static>
+         <pose frame="">-74.0572429427482 -84.46627359352725 26.420797041287727 0.31935658171534415 -0.831567579932505 0.03297080122207723</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 10.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>17 4 21</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>17 4 21</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_8">
+
+         <static>0</static>
+         <pose frame="">412.3563673807903 -259.4368500369897 36.996466249222316 1.5619120361976266 0.7727949248807424 2.412552098723818</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 9.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 80 18</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 80 18</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_9">
+
+         <static>0</static>
+         <pose frame="">-11.858347413983722 234.2158221421934 122.02548570001622 0.5309277082512971 -0.39405736108737116 -2.7350649088295</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 40.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 42 80</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 42 80</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_10">
+
+         <static>0</static>
+         <pose frame="">-33.75129935737728 -83.3598108660143 55.72671610518738 2.4567848882110987 0.3979253088145151 0.12235387876201204</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 26.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>19 32 53</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>19 32 53</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_11">
+
+         <static>0</static>
+         <pose frame="">17.450995279975718 13.212281870016644 51.873638426635026 1.5271647840788003 -0.4304544836010975 -1.3733088206336954</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 1.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>29 59 2</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>29 59 2</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_12">
+
+         <static>0</static>
+         <pose frame="">358.2581469068101 186.5104527555825 25.788748957403634 0.5498327682503273 -0.7561119998443238 -2.479884100281518</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 9.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>51 9 18</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>51 9 18</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_13">
+
+         <static>0</static>
+         <pose frame="">74.7569809633817 -112.3830147890181 90.22997043317412 1.5803468040517243 0.4599534199358597 1.0167679857245917</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 2.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>5 70 5</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>5 70 5</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_14">
+
+         <static>0</static>
+         <pose frame="">459.78843690105566 -63.73635860839458 25.89473980441047 -0.20856588078145638 0.43168174150425603 1.439872051473615</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 9.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 12 19</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 12 19</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_15">
+
+         <static>0</static>
+         <pose frame="">411.40052863587675 117.5820933410846 48.77979007932963 -0.18600792986621925 -0.9936585118943737 -1.8295803825838355</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 6.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 19 12</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 19 12</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_16">
+
+         <static>0</static>
+         <pose frame="">134.3969177161401 189.14216373082434 57.143592129098344 0.6840409017833986 -0.610936607499759 -2.4793229912128423</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 28.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 48 56</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 48 56</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_17">
+
+         <static>0</static>
+         <pose frame="">242.05479317128666 -181.77047679192927 16.6991977313724 3.0287650488025393 -1.2851719406618223 2.189229389821291</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 2.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>6 24 4</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>6 24 4</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_18">
+
+         <static>0</static>
+         <pose frame="">325.6500102340305 217.01563764673756 66.59160983790568 -1.1623119628396388 -0.6513247261636151 0.08178178106079148</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 15.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 7 31</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 7 31</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_19">
+
+         <static>0</static>
+         <pose frame="">356.5924140023402 -178.16877032752598 39.58664877969033 -0.5975885504891177 0.4683965171283847 -2.5905186506699036</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 40.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>24 2 80</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>24 2 80</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_20">
+
+         <static>0</static>
+         <pose frame="">367.4214196384262 152.0589168320596 14.599041796619964 1.7181479754694633 -0.8925632014911556 -0.6442755438084864</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 12.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>5 25 24</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>5 25 24</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_21">
+
+         <static>0</static>
+         <pose frame="">37.958847306672894 -225.9529826748852 26.14758529898042 3.0545641167293356 0.3063890576568477 -2.0083233192165126</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 12.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>55 80 25</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>55 80 25</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_22">
+
+         <static>0</static>
+         <pose frame="">45.807434599066795 -32.851590559110434 10.063333615545593 -2.7629161460580316 0.5461430881814143 -2.724640392457725</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 2.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>14 2 5</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>14 2 5</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_23">
+
+         <static>0</static>
+         <pose frame="">24.63713972458438 245.97211894607267 10.23929452437935 -0.7506853578298123 -0.36073338320592535 -2.8354679716508313</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 3.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>6 9 6</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>6 9 6</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_24">
+
+         <static>0</static>
+         <pose frame="">470.388330623251 283.4227263055027 87.42341851204823 1.6079361974260957 -0.03246479734551323 -0.041373225177656237</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 7.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>12 19 14</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>12 19 14</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_25">
+
+         <static>0</static>
+         <pose frame="">234.72960642850873 183.07378114577145 121.00302281310293 0.2664566386169044 -1.376887398377922 -0.0768247263606849</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 34.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>28 73 69</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>28 73 69</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_26">
+
+         <static>0</static>
+         <pose frame="">8.027803409125486 62.23140874866505 59.311772343856894 0.5031391277091957 -1.2213306456619344 -2.09700136662236</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 18.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 4 36</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>80 4 36</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_27">
+
+         <static>0</static>
+         <pose frame="">228.71928862791225 182.45229185250142 62.95004997718391 -1.4712115867800089 0.530674181302738 0.7168475518883778</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 37.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>46 20 74</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>46 20 74</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_28">
+
+         <static>0</static>
+         <pose frame="">260.99571581298727 -90.91251467236715 19.01947942970896 -2.2011163478745064 -0.008475178548264559 -0.647519043479782</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 14.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 11 29</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 11 29</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_29">
+
+         <static>0</static>
+         <pose frame="">-5.96618234284659 -97.76400468753081 34.40760024653789 0.41602728692938806 1.156824984334185 -0.5773128279855778</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 28.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>46 2 56</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>46 2 56</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_30">
+
+         <static>0</static>
+         <pose frame="">325.98457876270305 36.86401209636184 115.88105683729098 0.5092538200003092 0.6145808716151203 -1.5289601142268558</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 31.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 15 63</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 15 63</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_31">
+
+         <static>0</static>
+         <pose frame="">359.3838982010004 -44.015988671052675 80.17386360154467 1.0314724066292957 -0.546056726177914 0.29470299066334416</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 20.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>3 72 41</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>3 72 41</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_32">
+
+         <static>0</static>
+         <pose frame="">-22.437771818318133 -271.7909690933926 35.95271740675943 -2.1891599294407875 -0.6538346926677394 0.5004291249274879</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 1.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>47 12 2</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>47 12 2</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_33">
+
+         <static>0</static>
+         <pose frame="">421.30811123853954 -127.8855854393433 55.387769747157705 -2.6519049633324556 -1.2372899286040595 0.4921061509215547</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 40.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 26 80</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>2 26 80</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_34">
+
+         <static>0</static>
+         <pose frame="">391.7600085142029 -66.46759225944946 40.77677684956897 1.2730474085321963 -0.19599167138631673 0.12035175236885515</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 5.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>9 54 11</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>9 54 11</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_35">
+
+         <static>0</static>
+         <pose frame="">121.28071479417913 112.3010247144389 26.575189458996846 1.277772674828233 1.3653458555064466 -1.789174895466462</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 2.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>8 24 5</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>8 24 5</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_36">
+
+         <static>0</static>
+         <pose frame="">192.91278243439547 -32.86608190135155 44.02777190845731 -0.8243420794563763 0.19586530878830583 3.0118235983589634</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 12.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>28 9 24</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>28 9 24</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_37">
+
+         <static>0</static>
+         <pose frame="">285.0891195023333 66.66762491524183 58.669812488982444 -0.07246213718002313 -0.03306965649371403 -2.4542641546552586</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 23.5 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>9 25 47</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>9 25 47</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_38">
+
+         <static>0</static>
+         <pose frame="">279.18838425315573 -112.2410903781661 18.198628193649853 -0.6899002468187115 -0.004626312628517399 1.3647141381837866</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 1.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>28 24 2</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>28 24 2</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+      <model name="building_39">
+
+         <static>0</static>
+         <pose frame="">43.91606412712758 15.28510569433824 59.22778792578334 0.5138325842168987 -0.379866494358205 -0.21914236374072688</pose> <!--x y z roll pitch yaw -->
+
+         <link name="link">
+            <gravity>0</gravity>
+            <pose frame="">0 0 20.0 0 0 0</pose>  <!--0 0 halfheight 0 0 0--> 
+
+            <collision name="collision">
+
+               <geometry>
+
+                  <box>
+
+                     <size>14 2 40</size> <!--box widthx widthy height-->
+
+                  </box>
+
+               </geometry>
+
+               <max_contacts>10</max_contacts>
+
+               <surface>
+
+                  <contact>
+
+                     <ode/>
+
+                  </contact>
+
+                  <bounce/>
+
+                  <friction>
+
+                     <torsional>
+
+                        <ode/>
+
+                     </torsional>
+
+                     <ode/>
+
+                  </friction>
+
+               </surface>
+
+            </collision>
+
+            <visual name="visual">
+
+               <cast_shadows>0</cast_shadows>
+
+               <geometry>
+
+                  <box>
+
+                     <size>14 2 40</size>
+
+                  </box>
+
+               </geometry>
+
+               <material>
+
+                  <script>
+
+                     <uri>model://HANNAS_wall/materials/scripts</uri>
+
+                     <uri>model://HANNAS_wall/materials/textures</uri>
+
+                     <name>vrc/HANNAS_wall</name>
+
+                  </script>
+
+               </material>
+
+            </visual>
+
+            <self_collide>0</self_collide>
+
+            <enable_wind>0</enable_wind>
+
+            <kinematic>0</kinematic>
+
+         </link>
+
+      </model>
+
+   </world>
+</sdf>

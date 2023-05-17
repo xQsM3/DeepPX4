@@ -21,6 +21,9 @@ class Evaluator:
         elif "natural" in bag:
             world = self.get_world(bag,"natural")
             return self.decode_natural(world)
+        elif "random" in bag:
+            world = self.get_world(bag,"random")
+            return self.decode_random(world)
 
     def decode_cities(self,world):
         first = 1
@@ -43,6 +46,13 @@ class Evaluator:
         first = 3
         second = self.get_variable(world,"density_")
         third = self.get_variable(world,"terrain_")
+        fourth = 0
+        return [first,second,third,fourth]
+
+    def decode_random(self,world):
+        first = 4
+        second = self.get_variable(world,"scale_")
+        third = self.get_variable(world,"maxdense_")
         fourth = 0
         return [first,second,third,fourth]
 

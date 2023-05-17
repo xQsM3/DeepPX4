@@ -87,6 +87,7 @@ class Px4Tuner():
         if self._compute_goal_distance(xy=True) < 5:
             params["pitch_cost_param_"] = 25
             params["yaw_cost_param_"] = 20
+            params["velocity_cost_param_"] = 100
         # reduce smoothing if very near to goal
         if self._compute_goal_distance(xy=True) < 0.5 and self.drone.is_hovering():
             params["smoothing_speed_xy_"] = 0.3
