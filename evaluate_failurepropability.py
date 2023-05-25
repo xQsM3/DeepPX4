@@ -64,14 +64,23 @@ class Evaluator:
 
     def get_world(self,bag,maintype):
         print("###")
-        index = int(self.get_variable(bag,f"{maintype}_obst_") )
-        search = f"{maintype}_obst_" + str(index) # create search string for worlds
+        if maintype == "random":
+                index = int(self.get_variable(bag,f"{maintype}_obst_worldnum_") )
+                search = f"{maintype}_obst_worldnum_" + str(index) # create search string for worlds
+        else:
+                index = int(self.get_variable(bag,f"{maintype}_obst_") )
+                search = f"{maintype}_obst_" + str(index) # create search string for worlds
+        
+        
+        
         #if not search in self.worldfiles:
         #    raise FileNotFoundError(f"worldfile {search} not found")
         for world in self.worldfiles:
+            if "random" in world:
+                print(search,world)
             if str(search) in world:
-                break
-        return world
+                
+                return world
 
 
     def evaluate(self):
